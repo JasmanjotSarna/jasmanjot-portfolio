@@ -1,0 +1,223 @@
+/* PROJECTS SECTION */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.project-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 160, 23, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.project-card:hover {
+  background: rgba(212, 160, 23, 0.08);
+  border-color: #D4A017;
+  transform: translateY(-8px);
+  box-shadow: 0 20px 48px rgba(212, 160, 23, 0.2);
+}
+
+.project-card.featured-project {
+  grid-column: span 1;
+  background: linear-gradient(135deg, rgba(212, 160, 23, 0.1) 0%, rgba(212, 160, 23, 0.05) 100%);
+  border-color: rgba(212, 160, 23, 0.3);
+}
+
+.project-card.featured-project:hover {
+  background: linear-gradient(135deg, rgba(212, 160, 23, 0.15) 0%, rgba(212, 160, 23, 0.1) 100%);
+  border-color: #D4A017;
+}
+
+.project-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(212, 160, 23, 0.1);
+}
+
+.project-featured-badge {
+  display: inline-block;
+  background: #D4A017;
+  color: #000000;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.project-image {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(212, 160, 23, 0.05), rgba(212, 160, 23, 0.02));
+  border-bottom: 1px solid rgba(212, 160, 23, 0.1);
+}
+
+.project-image-placeholder {
+  font-size: 64px;
+  opacity: 0.8;
+}
+
+.project-body {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex-grow: 1;
+}
+
+.project-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.project-problem {
+  font-size: 14px;
+  color: #D4A017;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.project-solution {
+  font-size: 14px;
+  color: #E8EAED;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.project-results {
+  font-size: 14px;
+  color: #CCCCCC;
+}
+
+.project-results strong {
+  color: #D4A017;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.project-results ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.project-results li {
+  margin-bottom: 6px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.project-results li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: #D4A017;
+}
+
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tech-tag {
+  background: rgba(212, 160, 23, 0.15);
+  border: 1px solid rgba(212, 160, 23, 0.3);
+  color: #D4A017;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.project-card:hover .tech-tag {
+  background: rgba(212, 160, 23, 0.25);
+  border-color: #D4A017;
+}
+
+.project-links {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(212, 160, 23, 0.1);
+}
+
+.project-link {
+  flex: 1;
+  text-align: center;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid rgba(212, 160, 23, 0.3);
+  color: #D4A017;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.project-link:hover {
+  background: #D4A017;
+  color: #000000;
+  border-color: #D4A017;
+}
+
+.project-link.secondary {
+  background: rgba(212, 160, 23, 0.1);
+}
+
+.project-link.secondary:hover {
+  background: #D4A017;
+}
+
+@media (max-width: 1024px) {
+  .projects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .project-body {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .project-title {
+    font-size: 20px;
+  }
+
+  .project-image {
+    height: 140px;
+  }
+
+  .project-image-placeholder {
+    font-size: 48px;
+  }
+}
+

@@ -1,0 +1,27 @@
+/* ===== DESIGN TOKENS ===== */
+:root {
+  --bg:            #050505;
+  --bg-alt:        #0e0e0e;
+  --surface:       #111111;
+  --surface-2:     #1a1a1a;
+  --border:        rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.15);
+
+  --text:   #ffffff;
+  --text-2: rgba(255,255,255,0.60);
+  --text-3: rgba(255,255,255,0.35);
+
+  --accent:        #c9960c;
+  --accent-bright: #e0a812;
+  --accent-dim:    rgba(201,150,12,0.12);
+  --accent-border: rgba(201,150,12,0.40);
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'Inter', sans-serif;
+
+  --maxw:      1200px;
+  --radius:    12px;
+  --radius-sm: 8px;
+
+  --shadow-accent: 0 0 40px rgba(201,150,12,0.15);
+}

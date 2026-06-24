@@ -1,0 +1,242 @@
+/* EXPERIENCE / TIMELINE */
+.timeline {
+  position: relative;
+  padding-left: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #D4A017, rgba(212, 160, 23, 0.2), transparent);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 40px;
+  display: flex;
+  gap: 32px;
+  opacity: 0;
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.timeline-item:nth-child(1) { animation-delay: 0.1s; }
+.timeline-item:nth-child(2) { animation-delay: 0.2s; }
+.timeline-item:nth-child(3) { animation-delay: 0.3s; }
+.timeline-item:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.timeline-marker {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  margin-top: 6px;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -30px;
+  top: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #000000;
+  border: 3px solid #D4A017;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 0 16px rgba(212, 160, 23, 0.4);
+  transition: all 0.3s ease;
+}
+
+.timeline-item:hover .timeline-dot {
+  transform: scale(1.15);
+  box-shadow: 0 0 24px rgba(212, 160, 23, 0.6);
+}
+
+.timeline-content {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 160, 23, 0.15);
+  border-radius: 12px;
+  padding: 28px;
+  flex-grow: 1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.timeline-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: #D4A017;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.timeline-content:hover::before {
+  opacity: 1;
+}
+
+.timeline-item:hover .timeline-content {
+  background: rgba(212, 160, 23, 0.08);
+  border-color: #D4A017;
+  transform: translateX(8px);
+  box-shadow: 0 16px 40px rgba(212, 160, 23, 0.15);
+}
+
+.timeline-header {
+  margin-bottom: 16px;
+}
+
+.timeline-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.5px;
+}
+
+.timeline-company {
+  font-size: 14px;
+  color: #D4A017;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.timeline-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0 0;
+}
+
+.timeline-list li {
+  font-size: 14px;
+  color: #CCCCCC;
+  line-height: 1.8;
+  margin-bottom: 12px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.timeline-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: #D4A017;
+  font-weight: 700;
+}
+
+.timeline-list li:last-child {
+  margin-bottom: 0;
+}
+
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(212, 160, 23, 0.1);
+}
+
+.tech-tag {
+  background: rgba(212, 160, 23, 0.12);
+  border: 1px solid rgba(212, 160, 23, 0.25);
+  color: #D4A017;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.timeline-item:hover .tech-tag {
+  background: rgba(212, 160, 23, 0.2);
+  border-color: #D4A017;
+}
+
+@media (max-width: 768px) {
+  .timeline {
+    padding-left: 32px;
+  }
+
+  .timeline::before {
+    left: 4px;
+  }
+
+  .timeline-item {
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .timeline-marker {
+    width: 32px;
+  }
+
+  .timeline-dot {
+    left: -26px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .timeline-content {
+    padding: 20px;
+  }
+
+  .timeline-header h3 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .timeline {
+    padding-left: 24px;
+  }
+
+  .timeline::before {
+    left: 2px;
+  }
+
+  .timeline-dot {
+    left: -20px;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+
+  .timeline-content {
+    padding: 16px;
+  }
+
+  .timeline-header h3 {
+    font-size: 16px;
+  }
+
+  .timeline-list li {
+    font-size: 13px;
+  }
+}

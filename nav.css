@@ -1,0 +1,51 @@
+/* ===== NAV ===== */
+.nav {
+  position: fixed; top:0; left:0; right:0; z-index:200;
+  background: rgba(5,5,5,0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  max-width: var(--maxw); margin:0 auto;
+  padding: 1rem 2rem;
+  display: flex; align-items: center; gap: 2rem;
+}
+.logo { font-family: var(--font-display); font-size:1.8rem; letter-spacing:.05em; color:var(--text); flex-shrink:0; }
+.logo-dot { color: var(--accent); }
+
+.nav-links { display:flex; gap:2rem; margin-left:auto; font-size:.78rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
+.nav-links a { color:var(--text-2); transition:color .2s; }
+.nav-links a:hover { color:var(--accent); }
+
+.nav-right { display:flex; align-items:center; gap:1rem; margin-left:1rem; }
+
+.nav-cta {
+  font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--accent); padding:.5rem 1.3rem;
+  border:1.5px solid var(--accent-border); border-radius:30px;
+  transition:background .2s, color .2s; white-space:nowrap;
+}
+.nav-cta:hover { background:var(--accent); color:#000; }
+
+.menu-toggle { display:none; flex-direction:column; gap:5px; background:none; border:none; padding:.4rem; }
+.menu-toggle span { display:block; width:22px; height:2px; background:var(--text); border-radius:2px; transition:background .2s; }
+.menu-toggle:hover span { background:var(--accent); }
+
+/* Mobile overlay */
+.mobile-overlay {
+  position:fixed; inset:0; background:var(--bg); z-index:199;
+  display:none; flex-direction:column; align-items:center; justify-content:center; gap:2rem;
+}
+.mobile-overlay.open { display:flex; }
+.mobile-overlay a { font-family:var(--font-display); font-size:2.6rem; letter-spacing:.08em; color:var(--text); transition:color .2s; }
+.mobile-overlay a:hover { color:var(--accent); }
+.overlay-close { position:absolute; top:1.5rem; right:1.5rem; background:none; border:none; font-size:1.5rem; color:var(--text-2); transition:color .2s; }
+.overlay-close:hover { color:var(--accent); }
+.overlay-cta { font-family:var(--font-body) !important; font-size:.85rem !important; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent) !important; padding:.7rem 2rem; border:1.5px solid var(--accent-border); border-radius:30px; }
+
+@media (max-width:900px) {
+  .nav-links { display:none; }
+  .nav-cta   { display:none; }
+  .menu-toggle { display:flex; }
+}
