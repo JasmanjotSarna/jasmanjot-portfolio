@@ -51,6 +51,8 @@
   <link rel="stylesheet" href="contact.css" />
   <link rel="stylesheet" href="footer.css" />
   <link rel="stylesheet" href="animations.css" />
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#D4A017">
 </head>
 <body>
 
@@ -787,6 +789,14 @@
         lazyImages.forEach(img => img.src = img.dataset.src || img.src);
       }
     })();
+  </script>
+  <script>
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch((e) => console.warn('SW registration failed', e));
+      });
+    }
   </script>
 </body>
 </html>
