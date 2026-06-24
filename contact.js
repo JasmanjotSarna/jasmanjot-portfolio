@@ -42,23 +42,20 @@ if (contactForm) {
     return errors;
   }
 
+  const formMessage = document.getElementById('formMessage');
+
   // Show/hide form messages
   function showMessage(message, type) {
-    const messageEl = document.createElement('div');
-    messageEl.className = `form-message ${type}`;
-    messageEl.textContent = message;
-    
-    const existingMessage = contactForm.querySelector('.form-message');
-    if (existingMessage) {
-      existingMessage.remove();
-    }
-    
-    contactForm.appendChild(messageEl);
-    
-    setTimeout(() => {
-      messageEl.style.opacity = '0';
-      messageEl.style.transition = 'opacity 0.3s ease';
-      setTimeout(() => messageEl.remove(), 300);
+    if (!formMessage) return;
+
+    formMessage.className = `form-message ${type}`;
+    formMessage.textContent = message;
+    formMessage.style.opacity = '1';
+    formMessage.style.transition = 'opacity 0.3s ease';
+
+    clearTimeout(showMessage.timeoutId);
+    showMessage.timeoutId = setTimeout(() => {
+      formMessage.style.opacity = '0';
     }, 5000);
   }
 

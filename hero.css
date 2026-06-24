@@ -371,6 +371,7 @@
   .hero-content {
     grid-template-columns: 1fr;
     gap: 60px;
+    width: 100%;
   }
 
   .hero-text-bg {
@@ -379,10 +380,12 @@
 
   .hero-right {
     min-height: 400px;
+    width: 100%;
   }
 
   .hero-image-container {
-    max-width: 350px;
+    max-width: 100%;
+    width: 100%;
   }
 }
 
@@ -390,6 +393,10 @@
   .hero {
     min-height: auto;
     padding: 80px 24px 40px;
+  }
+
+  .hero-content {
+    gap: 40px;
   }
 
   .hero-name {
@@ -411,6 +418,15 @@
   .btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .hero-right {
+    min-height: auto;
+  }
+
+  .hero-image-container {
+    width: 100%;
+    max-width: 100%;
   }
 
   .tech-strip {
