@@ -34,7 +34,7 @@
 
 /* Mobile overlay */
 .mobile-overlay {
-  position:fixed; inset:0; background:var(--bg); z-index:199;
+  position:fixed; inset:0; background:var(--bg); z-index:999;
   display:none; flex-direction:column; align-items:center; justify-content:center; gap:2rem;
 }
 .mobile-overlay.open { display:flex; }
