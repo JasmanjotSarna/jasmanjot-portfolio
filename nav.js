@@ -7,9 +7,10 @@ const overlayClose = document.getElementById('overlayClose');
 
 if (menuToggle && mobileOverlay) {
   menuToggle.addEventListener('click', () => {
-    mobileOverlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    menuToggle.setAttribute('aria-expanded', 'true');
+    const isOpen = mobileOverlay.classList.toggle('open');
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    if (isOpen) overlayClose?.focus();
   });
 
   overlayClose?.addEventListener('click', closeMenu);

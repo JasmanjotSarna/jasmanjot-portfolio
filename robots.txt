@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://JasmanjotSarna.github.io/jasmanjot-portfolio/sitemap.xml
