@@ -1,8 +1,7 @@
-'use client'
-
 import { ExternalLink, Github } from 'lucide-react'
 import SectionHeader from './SectionHeader'
 import Reveal from './Reveal'
+import TiltCard from './TiltCard'
 
 const projects = [
   {
@@ -64,7 +63,7 @@ const projects = [
 function ProjectCard({ project, i }: { project: typeof projects[0]; i: number }) {
   return (
     <Reveal delay={i * 0.06} className={project.featured ? 'md:col-span-2' : ''}>
-      <div className="panel-hover p-7 md:p-9 h-full flex flex-col gap-6 group">
+      <TiltCard className="panel-hover p-7 md:p-9 h-full flex flex-col gap-6 group">
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5 mb-3">
@@ -125,7 +124,7 @@ function ProjectCard({ project, i }: { project: typeof projects[0]; i: number })
             </span>
           ))}
         </div>
-      </div>
+      </TiltCard>
     </Reveal>
   )
 }

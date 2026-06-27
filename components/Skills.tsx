@@ -83,38 +83,6 @@ export default function Skills() {
           </Reveal>
         ))}
       </div>
-
-      <Reveal delay={0.2} className="mt-12 panel p-7 md:p-9">
-        <h3 className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted mb-6">
-          GitHub Activity
-        </h3>
-        <div className="flex flex-wrap gap-10 mb-7">
-          {[
-            { value: '04+', label: 'Active Repos' },
-            { value: '100+', label: 'Commits' },
-            { value: 'PY', label: 'Primary Language' },
-          ].map((s) => (
-            <div key={s.label}>
-              <div className="font-mono text-2xl text-paper">{s.value}</div>
-              <div className="text-xs text-muted tracking-wide mt-1">{s.label}</div>
-            </div>
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-4">
-          <img
-            src="https://github-readme-stats.vercel.app/api?username=JasmanjotSarna&show_icons=true&theme=transparent&hide_border=true&title_color=4C8DFF&icon_color=4C8DFF&text_color=7C8694&hide=prs,issues"
-            alt="GitHub stats for JasmanjotSarna"
-            className="max-w-full"
-            style={{ maxHeight: '150px' }}
-          />
-          <img
-            src="https://github-readme-stats.vercel.app/api/top-langs/?username=JasmanjotSarna&layout=compact&theme=transparent&hide_border=true&title_color=4C8DFF&text_color=7C8694"
-            alt="Top languages for JasmanjotSarna"
-            className="max-w-full"
-            style={{ maxHeight: '150px' }}
-          />
-        </div>
-      </Reveal>
     </section>
   )
 }

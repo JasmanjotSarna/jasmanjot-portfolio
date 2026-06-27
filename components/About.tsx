@@ -1,5 +1,6 @@
 import SectionHeader from './SectionHeader'
 import Reveal from './Reveal'
+import AnimatedCounter from './AnimatedCounter'
 
 const pillars = [
   {
@@ -19,6 +20,13 @@ const pillars = [
   },
 ]
 
+const stats = [
+  { value: 4, suffix: '+', label: 'AI / CV Projects' },
+  { value: 15, suffix: '+', label: 'Technologies' },
+  { value: 6, suffix: '', label: 'Certifications' },
+  { value: 2, suffix: '', label: 'Years Learning' },
+]
+
 export default function About() {
   return (
     <section id="about" className="py-24 md:py-32 container-grid">
@@ -35,6 +43,17 @@ export default function About() {
             <span className="font-mono text-[11px] tracking-[0.18em] text-signal">{p.tag}</span>
             <h3 className="font-display text-xl font-semibold text-paper mt-4 mb-3">{p.title}</h3>
             <p className="text-muted text-sm leading-relaxed">{p.body}</p>
+          </Reveal>
+        ))}
+      </div>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-10">
+        {stats.map((s, i) => (
+          <Reveal key={s.label} delay={i * 0.06} className="panel p-6 text-center">
+            <div className="text-3xl md:text-4xl text-paper font-semibold">
+              <AnimatedCounter value={s.value} suffix={s.suffix} />
+            </div>
+            <div className="text-xs text-muted tracking-wide mt-2">{s.label}</div>
           </Reveal>
         ))}
       </div>

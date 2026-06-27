@@ -7,14 +7,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ink: '#090B0F',
-        'ink-raised': '#10131A',
-        paper: '#ECEEF2',
-        muted: '#7C8694',
-        signal: '#4C8DFF',
-        'signal-dim': 'rgba(76,141,255,0.12)',
-        amber: '#FFB454',
-        'amber-dim': 'rgba(255,180,84,0.12)',
+        ink: 'var(--ink)',
+        'ink-raised': 'var(--ink-raised)',
+        paper: 'var(--paper)',
+        muted: 'var(--muted)',
+        signal: 'var(--signal)',
+        'signal-dim': 'var(--signal-dim, rgba(76,141,255,0.12))',
+        amber: 'var(--amber)',
+        'amber-dim': 'var(--amber-dim, rgba(255,180,84,0.12))',
       },
       fontFamily: {
         display: ['"Space Grotesk"', '"Avenir Next"', '-apple-system', 'Helvetica Neue', 'Arial', 'sans-serif'],
