@@ -1,0 +1,16 @@
+{
+  "name": "Jasmanjot Singh Sarna — AI & ML Engineer",
+  "short_name": "JSS Portfolio",
+  "description": "AI/ML Engineer, Data Scientist, and Software Developer building production-ready AI applications.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090B0F",
+  "theme_color": "#4C8DFF",
+  "icons": [
+    {
+      "src": "/profile.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

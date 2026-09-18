@@ -1,0 +1,228 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { PERSONAL_INFO } from '@/lib/content'
+import { FileDown, Github, Linkedin, Mail, MapPin, GraduationCap } from 'lucide-react'
+import MagneticButton from './MagneticButton'
+
+const ROLES = [
+  'AI/ML Engineer & Systems Builder',
+  'Full Stack Developer (Next.js 15 + NestJS)',
+  'Data Analyst / Scientist (Python & EDA)',
+]
+
+export default function Hero() {
+  const [roleIndex, setRoleIndex] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Subtle scroll parallax on the cutout portrait
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start'],
+  })
+  const portraitY = useTransform(scrollYProgress, [0, 1], ['0%', '10%'])
+
+  // Role ticker cycle
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRoleIndex((prev) => (prev + 1) % ROLES.length)
+    }, 3600)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <section
+      ref={containerRef}
+      id="top"
+      className="relative pt-8 sm:pt-14 pb-16 sm:pb-24 border-b border-border overflow-hidden"
+    >
+      {/* Corner Crop Marks for Printed Proof Aesthetic */}
+      <div className="absolute top-3 left-4 font-mono text-[10px] text-muted/60 select-none hidden sm:block">
+        + PROOF_TL [0,0]
+      </div>
+      <div className="absolute top-3 right-4 font-mono text-[10px] text-muted/60 select-none hidden sm:block">
+        + PROOF_TR [1180,0]
+      </div>
+
+      <div className="container-editorial relative">
+        {/* Meta Kicker & Margin Annotation */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs text-muted mb-6">
+          <span className="flex items-center gap-1.5 text-ink font-medium">
+            <GraduationCap size={14} className="text-accent" />
+            <span>Final-Year B.Tech CSE (AI &amp; ML), 2023–2027</span>
+          </span>
+          <span className="text-border">•</span>
+          <span className="flex items-center gap-1">
+            <MapPin size={13} />
+            <span>Jaipur, Rajasthan, India</span>
+          </span>
+          <span className="text-border hidden md:inline">•</span>
+          <span className="font-mono text-[11px] text-accent font-semibold hidden md:inline">
+            Fig. 00 — Dossier
+          </span>
+        </div>
+
+        {/* Editorial "Cutout Over Headline" Layered Stage */}
+        <div className="relative mb-8 pt-2">
+          <div className="grid lg:grid-cols-[1.3fr_0.7fr] gap-6 items-end relative">
+            {/* Left Layer: Name and Core Pitch */}
+            <div className="relative z-10 flex flex-col justify-end">
+              {/* Line 1: Behind Head/Shoulder Plane */}
+              <div className="overflow-hidden">
+                <motion.h1
+                  initial={{ y: '110%' }}
+                  animate={{ y: '0%' }}
+                  transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                  className="font-display text-[clamp(3.8rem,11.5vw,9.5rem)] font-normal tracking-tight text-ink leading-[0.86] select-none"
+                >
+                  Jasmanjot
+                </motion.h1>
+              </div>
+
+              {/* Line 2: Interleaved with Cutout */}
+              <div className="overflow-hidden relative z-30">
+                <motion.div
+                  initial={{ y: '110%' }}
+                  animate={{ y: '0%' }}
+                  transition={{ duration: 0.9, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+                  className="font-display text-[clamp(3.8rem,11.5vw,9.5rem)] font-normal tracking-tight text-ink leading-[0.86] select-none"
+                >
+                  Singh Sarna
+                </motion.div>
+              </div>
+            </div>
+
+            {/* Right Layer: Transparent Cutout Standing Directly on Background */}
+            <div className="relative z-20 flex flex-col items-center lg:items-end -mt-8 lg:-mt-16">
+              <motion.div
+                style={{ y: portraitY }}
+                className="relative w-64 sm:w-80 lg:w-[380px] select-none"
+              >
+                {/* Cutout Image (No frame, no box, no offset accent block, no glow, no shadow blob) */}
+                <div className="relative aspect-square w-full">
+                  <Image
+                    src="/profile.png"
+                    alt={PERSONAL_INFO.name}
+                    width={520}
+                    height={520}
+                    priority
+                    sizes="(max-width: 640px) 280px, (max-width: 1024px) 360px, 420px"
+                    className="w-full h-auto object-contain drop-shadow-none transition-all duration-300"
+                  />
+                </div>
+
+                {/* Minimalist Baseline Grounding */}
+                <div className="mt-1 pt-1.5 border-t border-border/80 flex items-center justify-between font-mono text-[11px] text-muted">
+                  <span>Jasmanjot S. Sarna</span>
+                  <span className="text-accent font-medium">Jaipur, IN</span>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+
+        {/* Narrative & Focus Row */}
+        <div className="max-w-3xl">
+          {/* Vertical Ticker for Engineering Roles */}
+          <div className="h-7 sm:h-8 mb-4 overflow-hidden flex items-center">
+            <span className="font-mono text-xs text-muted uppercase tracking-wider mr-2.5">
+              Focus:
+            </span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={roleIndex}
+                initial={{ y: 16, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -16, opacity: 0 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                className="font-mono text-sm sm:text-base text-accent font-semibold tracking-tight"
+              >
+                {ROLES[roleIndex]}
+              </motion.span>
+            </AnimatePresence>
+          </div>
+
+          {/* Plain candid summary statement */}
+          <p className="text-base sm:text-lg text-muted leading-relaxed mb-8">
+            {PERSONAL_INFO.summary}
+          </p>
+
+          {/* Magnetic Action Buttons */}
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+            <MagneticButton>
+              <a
+                href={PERSONAL_INFO.resumePdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-editorial"
+                data-cursor="Resume"
+              >
+                <FileDown size={16} />
+                <span>Download Resume</span>
+              </a>
+            </MagneticButton>
+
+            <MagneticButton>
+              <a
+                href={PERSONAL_INFO.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
+                data-cursor="GitHub"
+              >
+                <Github size={16} />
+                <span>GitHub</span>
+              </a>
+            </MagneticButton>
+
+            <MagneticButton>
+              <a
+                href={PERSONAL_INFO.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
+                data-cursor="LinkedIn"
+              >
+                <Linkedin size={16} />
+                <span>LinkedIn</span>
+              </a>
+            </MagneticButton>
+
+            <MagneticButton>
+              <a
+                href={`mailto:${PERSONAL_INFO.email}`}
+                className="btn-secondary"
+                data-cursor="Email"
+              >
+                <Mail size={16} />
+                <span>Email</span>
+              </a>
+            </MagneticButton>
+          </div>
+
+          {/* Recruiter Fast Proof Anchor Bar */}
+          <div className="mt-10 pt-6 border-t border-border flex flex-wrap items-center gap-3 text-xs font-mono text-muted">
+            <span className="text-ink font-semibold">Fast Proof:</span>
+            <a
+              href="#projects"
+              className="text-accent hover:underline link-draw flex items-center gap-1"
+              data-cursor="View"
+            >
+              <span>01. CareerOS (10-Module SaaS)</span>
+            </a>
+            <span>•</span>
+            <a
+              href="#proof-piece"
+              className="text-accent hover:underline link-draw flex items-center gap-1"
+              data-cursor="Explore"
+            >
+              <span>02. Multi-Agent Pipeline</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
