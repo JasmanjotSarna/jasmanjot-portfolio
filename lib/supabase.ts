@@ -1,16 +1,15 @@
 import 'server-only'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseServiceRoleKey)
-
 export function getSupabaseServerClient() {
-  if (!isSupabaseConfigured) {
+  const supabaseUrl = process.env.SUPABASE_URL
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
     return null
   }
-  return createClient(supabaseUrl!, supabaseServiceRoleKey!, {
+
+  return createClient(supabaseUrl, supabaseServiceRoleKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,

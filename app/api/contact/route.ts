@@ -126,11 +126,35 @@ export async function POST(request: Request) {
     const rawUserAgent = request.headers.get('user-agent') || ''
     const userAgent = rawUserAgent.slice(0, 200)
 
+    // Check available backend services lazily
+    const supabase = getSupabaseServerClient()
+    const resendApiKey = process.env.RESEND_API_KEY
+
+    // In production, if required env vars are missing, return a clear 503 with mailto fallback
+    // NEVER return a fake success in production
+    if (!isDev && !supabase && !resendApiKey) {
+      return NextResponse.json(
+        {
+          error:
+            'Contact service is temporarily unavailable. Please reach out directly at jasmanjotsinghsarna@gmail.com.',
+        },
+        { status: 503 }
+      )
+    }
+
+    // In local development without configured keys: log receipt without PII and return simulated success
+    if (isDev && !supabase && !resendApiKey) {
+      console.log('[ContactAPI:Dev] Form submitted in development mode (keys unconfigured).')
+      return NextResponse.json({
+        success: true,
+        message: "Got it. I'll reply within a couple of days.",
+      })
+    }
+
     let dbSuccess = false
     let insertedMessageId: string | null = null
 
     // 9. Database Storage (Supabase)
-    const supabase = getSupabaseServerClient()
     if (supabase) {
       try {
         const { data, error } = await supabase
@@ -156,13 +180,10 @@ export async function POST(request: Request) {
       } catch (err) {
         console.error('[ContactAPI] DB exception:', (err as Error).name)
       }
-    } else {
-      console.warn('[ContactAPI] Supabase not configured in environment')
     }
 
     // 10. Email Notification (Resend)
     let emailSuccess = false
-    const resendApiKey = process.env.RESEND_API_KEY
 
     if (resendApiKey) {
       try {
@@ -178,7 +199,7 @@ export async function POST(request: Request) {
           from: fromEmail,
           to: [toEmail],
           replyTo: email,
-          subject: `New portfolio message from ${name}`,
+          subject: 'New portfolio message received',
           text: `New Portfolio Message\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n`,
           html: `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; padding: 24px; border: 1px solid #E5E0D8; border-radius: 4px; background: #FBF9F5; color: #181716;">
@@ -216,26 +237,23 @@ export async function POST(request: Request) {
       } catch (err) {
         console.error('[ContactAPI] Email exception:', (err as Error).name)
       }
-    } else {
-      console.warn('[ContactAPI] Resend API key not configured in environment')
     }
 
-    // 11. Graceful Failure Resolution
-    // If either DB or Email succeeded, or in local development without keys:
-    if (dbSuccess || emailSuccess || (!process.env.SUPABASE_URL && !process.env.RESEND_API_KEY)) {
+    // 11. Graceful Resolution
+    if (dbSuccess || emailSuccess) {
       return NextResponse.json({
         success: true,
         message: "Got it. I'll reply within a couple of days.",
       })
     }
 
-    // If BOTH configured services failed:
+    // If services were configured but both failed:
     return NextResponse.json(
       {
         error:
           'Unable to deliver message right now. Please email directly at jasmanjotsinghsarna@gmail.com',
       },
-      { status: 500 }
+      { status: 503 }
     )
   } catch (err) {
     // Top-level crash safety: never leak stack trace or internal error messages

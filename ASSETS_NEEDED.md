@@ -1,77 +1,62 @@
-# Master Asset Checklist for Jasmanjot Singh Sarna's Portfolio
+# Master Action Items & Assets Checklist for Jasmanjot
 
-This checklist tracks every missing link, video, benchmark metric, and media asset needed to bring the portfolio to 100% completion.
-
-When `SHOW_PLACEHOLDERS: boolean = false` in `lib/content.ts` (the production default), all unsupplied links, video frames, and metric boxes are automatically hidden from visitors so no "TODO" or placeholder elements ever leak to recruiters.
+This document contains all developer-side action items, assets to supply, and production deployment configuration for **jasmanjot-portfolio**.
 
 ---
 
-## 1. Resume PDF Update (Crucial)
-- [ ] **`/public/resume.pdf`**:
-  - The current PDF still reads "CareerForge AI".
-  - **Action**: Export an updated PDF from your resume builder with "CareerOS" as the title for the 10-module SaaS project, and place it at `/public/resume.pdf` (replacing the old file).
+## 1. Resume PDF (Immediate Action Item)
+
+- [ ] **Replace `/public/resume.pdf`**:
+  - The file currently at `/public/resume.pdf` still refers to the SaaS platform as "CareerForge AI".
+  - **Action**: Export an updated PDF from your resume builder with the official name **"CareerOS"**, rename the file to `resume.pdf`, and place it in `/public/resume.pdf` (overwriting the existing file).
+  - The website's master download buttons, hero links, and mobile action bars are already wired to `/resume.pdf`.
 
 ---
 
-## 2. Project 01: CareerOS (AI Career Operating System)
-- [ ] **GitHub Repository URL**:
-  - Add to `PROJECTS[0].links.github.url` in `lib/content.ts`.
-  - Set `PROJECTS[0].links.github.isTodo = false`.
-- [ ] **Live Deployment URL**:
-  - Add to `PROJECTS[0].links.live.url` in `lib/content.ts`.
-  - Set `PROJECTS[0].links.live.isTodo = false`.
-- [ ] **Demo Video / Walkthrough**:
-  - Walkthrough recording or MP4/WebM/Loom demonstrating the AI Resume Suite, ATS builder, or Interview Suite.
-  - Add link to `PROJECTS[0].links.demoMedia.url` or drop asset in `/public/media/careeros-demo.mp4`.
-- [ ] **Architecture Confirmation**:
-  - Confirm whether the backend queue uses BullMQ + Redis, and whether PostgreSQL is the primary database.
+## 2. Vercel Environment Variables Configuration
+
+Add these environment variables in your **Vercel Project Dashboard** under **Settings &rarr; Environment Variables**:
+
+| Variable Name | Required? | Description & Where to Get It |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_SITE_URL` | Recommended | Canonical production URL (e.g. `https://jasmanjot-portfolio.vercel.app` or `https://jasmanjotsarna.dev`). |
+| `SUPABASE_URL` | **Required for DB** | Supabase Project URL (`https://<project>.supabase.co`). Found in **Supabase Dashboard &rarr; Project Settings &rarr; API &rarr; Project URL**. |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Required for DB** | Supabase secret service role key (server-only). Found in **Supabase Dashboard &rarr; Project Settings &rarr; API &rarr; service_role**. |
+| `RESEND_API_KEY` | **Required for Email** | Resend API key (`re_...`). Found in **Resend Dashboard &rarr; API Keys &rarr; Create API Key**. |
+| `CONTACT_TO_EMAIL` | Optional | Destination email address. Defaults to `jasmanjotsinghsarna@gmail.com`. |
+| `CONTACT_FROM_EMAIL` | Optional | Sender email. Defaults to `Portfolio Contact <onboarding@resend.dev>`. Set to `contact@yourdomain.com` once your domain is verified in Resend. |
+| `UPSTASH_REDIS_REST_URL` | Optional | Distributed Redis URL for rate limiting. Found in **Upstash Console &rarr; Redis Database &rarr; REST API**. |
+| `UPSTASH_REDIS_REST_TOKEN` | Optional | Distributed Redis REST Token. Found in **Upstash Console &rarr; Redis Database &rarr; REST API**. |
+| `IP_HASH_SALT` | Optional | Random string for cryptographic IP hashing (prevents rainbow table lookups). Any random string. |
+
+> **Note on Build Time**: The application is designed with zero build-time secret dependencies. `next build` will succeed even if none of these environment variables are provided during build.
 
 ---
 
-## 3. Project 02: Multi AI Agent Research System
-- [ ] **GitHub Repository URL**:
-  - Add to `PROJECTS[1].links.github.url` in `lib/content.ts`.
-  - Set `PROJECTS[1].links.github.isTodo = false`.
-- [ ] **Execution Screen Recording / CLI Demo**:
-  - Short GIF or video clip demonstrating the LangChain CLI execution (search, reader, writer, critic agents operating sequentially).
-  - Add link to `PROJECTS[1].links.demoMedia.url` in `lib/content.ts`.
-- [ ] **Architecture Confirmation**:
-  - Confirm message passing format between LangChain agents (e.g., JSON state object vs string piping).
+## 3. Project Links & Media Assets
+
+All project metadata is centralized in [`lib/content.ts`](./lib/content.ts). When you are ready to publish links or recordings, update the respective objects:
+
+### Project 01: CareerOS
+- [ ] **GitHub Repo URL**: Set `PROJECTS[0].links.github.url = 'https://github.com/JasmanjotSarna/careeros'` and `isTodo = false`.
+- [ ] **Live Platform URL**: Set `PROJECTS[0].links.live.url = 'https://careeros.app'` and `isTodo = false`.
+- [ ] **Demo Video / Loom**: Add link to `PROJECTS[0].links.demoMedia.url` or drop MP4 in `/public/media/careeros-demo.mp4`.
+
+### Project 02: Multi AI Agent Research System
+- [ ] **GitHub Repo URL**: Set `PROJECTS[1].links.github.url` and `isTodo = false`.
+- [ ] **Execution Screen Recording**: Short recording of CLI/pipeline execution to attach to `PROJECTS[1].links.demoMedia.url`.
+
+### Project 03: Face Emotion Recognition System
+- [ ] **GitHub Repo URL**: Set `PROJECTS[2].links.github.url` and `isTodo = false`.
+- [ ] **Webcam Demo Clip**: Screen recording showing emotion classification bounding boxes.
+- [ ] **Benchmark Metrics**: Supply validation accuracy % and inference FPS for TensorFlow vs PyTorch.
+
+### Project 04: Health Score Predictor
+- [ ] **GitHub Repo URL**: Set `PROJECTS[3].links.github.url` and `isTodo = false`.
+- [ ] **Benchmark Metrics**: Supply $R^2$ score and Mean Absolute Error (MAE) from regression analysis.
 
 ---
 
-## 4. Project 03: Face Emotion Recognition System
-- [ ] **GitHub Repository URL**:
-  - Add to `PROJECTS[2].links.github.url` in `lib/content.ts`.
-  - Set `PROJECTS[2].links.github.isTodo = false`.
-- [ ] **Webcam Demo Clip**:
-  - Screen recording showing the real-time emotion classifier bounding box and emotion labels via webcam.
-  - Add to `PROJECTS[2].links.demoMedia.url` in `lib/content.ts`.
-- [ ] **Benchmark Metrics**:
-  - Supply the validation accuracy % and inference FPS for TensorFlow vs PyTorch CNN models from training notebooks.
-  - Add to `PROJECTS[2].metricTodo` or create an explicit benchmark comparison table.
-
----
-
-## 5. Project 04: Health Score Predictor
-- [ ] **GitHub Repository URL**:
-  - Add to `PROJECTS[3].links.github.url` in `lib/content.ts`.
-  - Set `PROJECTS[3].links.github.isTodo = false`.
-- [ ] **Benchmark Metrics**:
-  - Supply $R^2$ score, Mean Absolute Error (MAE), and dataset sample count from regression analysis scripts.
-- [ ] **Algorithm Confirmation**:
-  - Confirm the exact regression algorithms used (e.g. Ridge Regression, Random Forest Regressor, Gradient Boosting).
-
----
-
-## 6. Form Notification Provider (Optional Setup)
-- The working contact form (`/api/contact`) is pre-wired to:
-  - **Formspree**: Set `FORMSPREE_ENDPOINT="https://formspree.io/f/your_id"` in `.env.local` or Vercel environment variables.
-  - **Resend**: Set `RESEND_API_KEY="re_..."` in `.env.local` or Vercel environment variables.
-  - **Local / Default**: Without any environment variables, it logs submissions cleanly to the server console and safely confirms submission to the visitor.
-
----
-
-## 7. Draft Problem Statements Approval
-If you wish to display problem statements in the project cards:
-- Change `SHOW_DRAFT_PROBLEMS = true` in `lib/content.ts` once you have approved the draft copy.
+## 4. Draft Copy Approvals
+- [ ] **Problem Statements**: To display concise problem statements above each project, set `SHOW_DRAFT_PROBLEMS = true` in `lib/content.ts`.
+- [ ] **Leadership Experience**: To display the AIESEC Jaipur leadership section, set `SHOW_LEADERSHIP = true` in `lib/content.ts`.
