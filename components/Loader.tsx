@@ -1,42 +1,100 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
-import silhouetteData from '@/lib/silhouette-data.json'
+import gsap from 'gsap'
+import portraitPointsData from '@/public/portrait-points.json'
 
-// TIMING CONSTANTS (Milliseconds)
-const T_DATA_END = 1000      // Phase 1: Data scatter ends
-const T_MODEL_END = 2200     // Phase 2: Silhouette & face detection ends
-const T_TOTAL = 3000         // Phase 3: Product reveal & curtain split finishes
-const T_REPEAT_TOTAL = 600   // Repeat visit duration
+// 14 SKILL NODES (Direct from Jasmanjot's Master Resume)
+const RESUME_SKILLS = [
+  'Python',
+  'OpenAI API',
+  'LangChain',
+  'RAG',
+  'PyTorch',
+  'TensorFlow',
+  'Scikit-Learn',
+  'OpenCV',
+  'Pandas',
+  'SQL',
+  'Power BI',
+  'Next.js',
+  'NestJS',
+  'PostgreSQL',
+]
 
-export default function Loader({ onComplete }: { onComplete?: () => void }) {
+interface LoaderProps {
+  onComplete?: () => void
+}
+
+interface Particle {
+  // Initial Network Position
+  netX: number
+  netY: number
+  vx: number
+  vy: number
+  // Target Portrait Position
+  targetX: number
+  targetY: number
+  // Current Interpolated Position
+  x: number
+  y: number
+  size: number
+  isLabelNode: boolean
+  label: string
+}
+
+interface Pulse {
+  edgeIndex: number
+  progress: number // 0 to 1 along edge
+  speed: number
+}
+
+export default function Loader({ onComplete }: LoaderProps) {
   const [mounted, setMounted] = useState(false)
-  const [phase, setPhase] = useState<'data' | 'model' | 'product' | 'curtain' | 'done'>('data')
+  const [phase, setPhase] = useState<'network' | 'forming' | 'opening' | 'done'>('network')
   const [isRepeat, setIsRepeat] = useState(false)
   const [isSkipped, setIsSkipped] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const animFrameRef = useRef<number>(0)
-  const startTimeRef = useRef<number>(0)
+  const [preloaded, setPreloaded] = useState(false)
 
-  // Handle dismissal
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const profileImgRef = useRef<HTMLImageElement | null>(null)
+  const timelineRef = useRef<gsap.core.Timeline | null>(null)
+  const animStateRef = useRef({
+    networkProgress: 0,
+    formingProgress: 0,
+    openingProgress: 0,
+    curtainTop: 0,
+    curtainBottom: 0,
+    labelAlpha: 1,
+    meshAlpha: 1,
+    photoAlpha: 0,
+  })
+
+  // Dismiss / Complete callback
   const handleDismiss = useCallback(() => {
     setIsSkipped(true)
     setPhase('done')
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('js_loader_seen', 'true')
     }
+    if (timelineRef.current) {
+      timelineRef.current.kill()
+    }
     if (onComplete) onComplete()
   }, [onComplete])
 
+  // 1. Initial Checks (URL params, reduced-motion, repeat visit, preloads)
   useEffect(() => {
-    // 1. Check if ?noloader flag is in URL
+    if (typeof window === 'undefined') return
+
+    // Check ?noloader flag
     const urlParams = new URLSearchParams(window.location.search)
     if (urlParams.has('noloader')) {
       handleDismiss()
       return
     }
 
-    // 2. Check prefers-reduced-motion or Save-Data
+    // Check prefers-reduced-motion or Save-Data
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const saveData = (navigator as unknown as { connection?: { saveData?: boolean } })?.connection?.saveData === true
     if (reducedMotion || saveData) {
@@ -44,228 +102,373 @@ export default function Loader({ onComplete }: { onComplete?: () => void }) {
       return
     }
 
-    // 3. Check repeat visit
-    const alreadySeen = sessionStorage.getItem('js_loader_seen')
-    if (alreadySeen) {
+    // Check repeat visit in same session
+    const seen = sessionStorage.getItem('js_loader_seen')
+    if (seen) {
       setIsRepeat(true)
     }
 
     setMounted(true)
 
+    // Preload profile cutout image and fonts
+    const img = new window.Image()
+    img.src = '/profile.png'
+    img.onload = () => {
+      profileImgRef.current = img
+      if (document.fonts) {
+        document.fonts.ready.then(() => setPreloaded(true)).catch(() => setPreloaded(true))
+      } else {
+        setPreloaded(true)
+      }
+    }
+    img.onerror = () => setPreloaded(true)
+
     // Keyboard listener for skip
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = () => {
       handleDismiss()
     }
     window.addEventListener('keydown', handleKeyDown)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
-      cancelAnimationFrame(animFrameRef.current)
     }
   }, [handleDismiss])
 
-  // Canvas Particle Animation
+  // 2. Canvas Animation Controller
   useEffect(() => {
-    if (!mounted || isSkipped) return
+    if (!mounted || isSkipped || isRepeat) return
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { alpha: false })
     if (!ctx) return
 
     let width = (canvas.width = window.innerWidth)
     let height = (canvas.height = window.innerHeight)
+    const dpr = Math.min(2, window.devicePixelRatio || 1)
+    canvas.width = width * dpr
+    canvas.height = height * dpr
+    ctx.scale(dpr, dpr)
 
     const isMobile = width < 768
-    const pointsData = isMobile ? silhouetteData.mobilePoints : silhouetteData.points
-    const totalPoints = pointsData.length
+    const pointsRaw = isMobile ? portraitPointsData.mobilePoints : portraitPointsData.points
+    const edgesRaw = isMobile ? portraitPointsData.mobileEdges : portraitPointsData.edges
 
-    // Target portrait dimensions and center position on screen
-    const targetSize = Math.min(width * 0.75, height * 0.65, 480)
+    // Portrait target bounding box (centered in viewport)
+    const targetSize = Math.min(width * 0.72, height * 0.64, 460)
     const targetLeft = (width - targetSize) / 2
     const targetTop = (height - targetSize) / 2 + 10
 
-    // Initialize point objects
-    const particles = pointsData.map(([nx, ny]) => {
+    // Assign 14 resume skill labels to the most prominent facial/contour nodes
+    const labelCount = isMobile ? 8 : 14
+    const labelSkills = RESUME_SKILLS.slice(0, labelCount)
+
+    // Initialize particles
+    const particles: Particle[] = pointsRaw.map(([nx, ny], idx) => {
+      const isLabelNode = idx < labelCount
+      const label = isLabelNode ? labelSkills[idx] : ''
+
+      // Network initial coordinate: distributed across screen with central clustering
+      const angle = (idx / pointsRaw.length) * Math.PI * 2
+      const radius = 60 + Math.random() * (Math.min(width, height) * 0.42)
+      const netX = width / 2 + Math.cos(angle) * radius + (Math.random() - 0.5) * 80
+      const netY = height / 2 + Math.sin(angle) * radius + (Math.random() - 0.5) * 80
+
+      const targetX = targetLeft + nx * targetSize
+      const targetY = targetTop + ny * targetSize
+
       return {
-        // Random initial scatter (Phase 1)
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: (Math.random() - 0.5) * 1.2,
-        // Target silhouette coordinate (Phase 2)
-        targetX: targetLeft + nx * targetSize,
-        targetY: targetTop + ny * targetSize,
-        size: Math.random() > 0.8 ? 2.2 : 1.4,
-        alpha: 0.2 + Math.random() * 0.4,
+        netX: Math.max(20, Math.min(width - 20, netX)),
+        netY: Math.max(40, Math.min(height - 40, netY)),
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
+        targetX,
+        targetY,
+        x: netX,
+        y: netY,
+        size: isLabelNode ? 2.8 : 1.5,
+        isLabelNode,
+        label,
       }
     })
 
-    // Face detection box coordinates
-    const faceBox = {
-      x: targetLeft + silhouetteData.faceBox.x * targetSize,
-      y: targetTop + silhouetteData.faceBox.y * targetSize,
-      w: silhouetteData.faceBox.width * targetSize,
-      h: silhouetteData.faceBox.height * targetSize,
+    // Active network pulses along edges during Phase 1
+    const activePulses: Pulse[] = []
+    const numPulses = isMobile ? 3 : 7
+    for (let p = 0; p < numPulses; p++) {
+      activePulses.push({
+        edgeIndex: Math.floor(Math.random() * Math.min(60, edgesRaw.length)),
+        progress: Math.random(),
+        speed: 0.008 + Math.random() * 0.012,
+      })
     }
 
-    // Landmarks
-    const landmarks = silhouetteData.landmarks.map((lm) => ({
-      x: targetLeft + lm.x * targetSize,
-      y: targetTop + lm.y * targetSize,
-      label: lm.label,
-    }))
-
-    // Background floating numerals (Unsorted data)
-    const floatingData = [
-      { text: 'x_0 = [0.824, 0.129]', x: width * 0.15, y: height * 0.25, v: 0.3 },
-      { text: 'tensor([1254, 1254, 4])', x: width * 0.78, y: height * 0.32, v: -0.2 },
-      { text: 'alpha_channel: 0xFF', x: width * 0.12, y: height * 0.72, v: 0.25 },
-      { text: 'loss: 0.0031', x: width * 0.82, y: height * 0.68, v: -0.35 },
-    ]
-
-    const startTime = performance.now()
-    startTimeRef.current = startTime
-
-    const render = (now: number) => {
-      const elapsed = now - startTime
-      ctx.clearRect(0, 0, width, height)
-
-      // 1. DATA PHASE (0 - 1000ms)
-      if (elapsed < T_DATA_END) {
-        setPhase('data')
-        const p = elapsed / T_DATA_END
-
-        // Draw faint data strings
-        ctx.font = '11px monospace'
-        ctx.fillStyle = `rgba(158, 154, 146, ${0.4 * (1 - p * 0.5)})`
-        floatingData.forEach((d) => {
-          ctx.fillText(d.text, d.x, d.y + p * 15 * d.v)
-        })
-
-        // Draw drifting particles
-        particles.forEach((pt) => {
-          pt.x += pt.vx
-          pt.y += pt.vy
-          // Boundary bounce
-          if (pt.x < 0 || pt.x > width) pt.vx *= -1
-          if (pt.y < 0 || pt.y > height) pt.vy *= -1
-
-          ctx.fillStyle = `rgba(158, 154, 146, ${pt.alpha})`
-          ctx.fillRect(pt.x, pt.y, pt.size, pt.size)
-        })
+    // Spatial hash grid for fast O(N) neighbor lookups during Network phase
+    const spatialCellSize = 100
+    function buildSpatialGrid() {
+      const grid = new Map<string, number[]>()
+      for (let i = 0; i < particles.length; i++) {
+        const pt = particles[i]
+        const gx = Math.floor(pt.x / spatialCellSize)
+        const gy = Math.floor(pt.y / spatialCellSize)
+        const key = `${gx}_${gy}`
+        if (!grid.has(key)) grid.set(key, [])
+        grid.get(key)!.push(i)
       }
-      // 2. MODEL PHASE (1000 - 2200ms)
-      else if (elapsed < T_MODEL_END) {
-        setPhase('model')
-        const modelElapsed = elapsed - T_DATA_END
-        const modelProgress = Math.min(1, modelElapsed / 1000)
+      return grid
+    }
 
-        // Ease interpolation using cubic-bezier(0.22, 1, 0.36, 1) approximation
-        const ease =
-          modelProgress < 0.5
-            ? 4 * modelProgress * modelProgress * modelProgress
-            : 1 - Math.pow(-2 * modelProgress + 2, 3) / 2
+    // FPS Monitor for dropping heavy effects on low-end mobile
+    let lastTime = performance.now()
+    let frameCount = 0
+    let dropPulses = isMobile
 
-        // Interpolate particles toward silhouette target
-        particles.forEach((pt) => {
-          const curX = pt.x + (pt.targetX - pt.x) * ease
-          const curY = pt.y + (pt.targetY - pt.y) * ease
+    // GSAP Master Sequence Timeline
+    const state = animStateRef.current
+    const tl = gsap.timeline({
+      onComplete: () => {
+        handleDismiss()
+      },
+    })
+    timelineRef.current = tl
 
-          ctx.fillStyle = `rgba(192, 74, 38, ${0.4 + ease * 0.55})`
-          ctx.fillRect(curX, curY, pt.size * (1 + ease * 0.3), pt.size * (1 + ease * 0.3))
-        })
+    // Phase 1: Network (0 to 0.9s)
+    tl.to(state, {
+      networkProgress: 1,
+      duration: 0.9,
+      ease: 'power1.out',
+      onStart: () => setPhase('network'),
+    })
 
-        // When silhouette converges (modelElapsed > 500ms), draw face detection bounding box
-        if (modelElapsed > 500) {
-          const boxAlpha = Math.min(1, (modelElapsed - 500) / 400)
-          ctx.strokeStyle = `rgba(192, 74, 38, ${boxAlpha * 0.85})`
-          ctx.lineWidth = 1.2
+    // Phase 2: Forming into Portrait (0.9 to 2.3s)
+    tl.to(
+      state,
+      {
+        formingProgress: 1,
+        duration: 1.4,
+        ease: 'power3.inOut',
+        onStart: () => setPhase('forming'),
+      },
+      0.9
+    )
 
-          // Detection Box with Corner Ticks
-          const tick = 14
+    // Fade out labels during forming
+    tl.to(
+      state,
+      {
+        labelAlpha: 0,
+        duration: 0.6,
+        ease: 'power2.out',
+      },
+      1.1
+    )
+
+    // Phase 3: Opening into Hero Shared Element (2.3 to 3.0s)
+    tl.to(
+      state,
+      {
+        openingProgress: 1,
+        photoAlpha: 1,
+        meshAlpha: 0,
+        curtainTop: -100,
+        curtainBottom: 100,
+        duration: 0.7,
+        ease: 'power2.inOut',
+        onStart: () => setPhase('opening'),
+      },
+      2.3
+    )
+
+    // Render loop driven by GSAP Ticker for 60fps frame synchronization
+    const render = () => {
+      // Check FPS
+      const now = performance.now()
+      frameCount++
+      if (now - lastTime >= 1000) {
+        const fps = (frameCount * 1000) / (now - lastTime)
+        if (fps < 55) dropPulses = true
+        frameCount = 0
+        lastTime = now
+      }
+
+      // 1. Clear background to Ink (#141413)
+      ctx.fillStyle = '#141413'
+      ctx.fillRect(0, 0, width, height)
+
+      const fProg = state.formingProgress
+
+      // 2. Update particle positions (Network drift -> ease to portrait)
+      for (let i = 0; i < particles.length; i++) {
+        const pt = particles[i]
+        if (fProg < 0.001) {
+          // Subtle drifting in Network phase
+          pt.netX += pt.vx
+          pt.netY += pt.vy
+          if (pt.netX < 15 || pt.netX > width - 15) pt.vx *= -1
+          if (pt.netY < 35 || pt.netY > height - 35) pt.vy *= -1
+          pt.x = pt.netX
+          pt.y = pt.netY
+        } else {
+          // Smooth interpolation from current network position to portrait target
+          pt.x = pt.netX + (pt.targetX - pt.netX) * fProg
+          pt.y = pt.netY + (pt.targetY - pt.netY) * fProg
+        }
+      }
+
+      // 3. Draw Lines & Connections
+      if (state.meshAlpha > 0.01) {
+        ctx.lineWidth = 0.8
+        const maxDistSq = 85 * 85
+
+        if (fProg < 0.6) {
+          // Phase 1 / Early Phase 2: Dynamic network connections via spatial grid
+          const grid = buildSpatialGrid()
+          ctx.strokeStyle = `rgba(251, 249, 245, ${0.14 * (1 - fProg)})`
           ctx.beginPath()
-          // Top Left
-          ctx.moveTo(faceBox.x, faceBox.y + tick)
-          ctx.lineTo(faceBox.x, faceBox.y)
-          ctx.lineTo(faceBox.x + tick, faceBox.y)
-          // Top Right
-          ctx.moveTo(faceBox.x + faceBox.w - tick, faceBox.y)
-          ctx.lineTo(faceBox.x + faceBox.w, faceBox.y)
-          ctx.lineTo(faceBox.x + faceBox.w, faceBox.y + tick)
-          // Bottom Left
-          ctx.moveTo(faceBox.x, faceBox.y + faceBox.h - tick)
-          ctx.lineTo(faceBox.x, faceBox.y + faceBox.h)
-          ctx.lineTo(faceBox.x + tick, faceBox.y + faceBox.h)
-          // Bottom Right
-          ctx.moveTo(faceBox.x + faceBox.w - tick, faceBox.y + faceBox.h)
-          ctx.lineTo(faceBox.x + faceBox.w, faceBox.y + faceBox.h)
-          ctx.lineTo(faceBox.x + faceBox.w, faceBox.y + faceBox.h - tick)
+
+          for (let i = 0; i < particles.length; i++) {
+            const pt = particles[i]
+            const gx = Math.floor(pt.x / spatialCellSize)
+            const gy = Math.floor(pt.y / spatialCellSize)
+            let linesDrawn = 0
+
+            for (let dx = -1; dx <= 1 && linesDrawn < 3; dx++) {
+              for (let dy = -1; dy <= 1 && linesDrawn < 3; dy++) {
+                const cell = grid.get(`${gx + dx}_${gy + dy}`)
+                if (!cell) continue
+                for (const j of cell) {
+                  if (j <= i) continue
+                  const other = particles[j]
+                  const dSq = (pt.x - other.x) * (pt.x - other.x) + (pt.y - other.y) * (pt.y - other.y)
+                  if (dSq < maxDistSq) {
+                    ctx.moveTo(pt.x, pt.y)
+                    ctx.lineTo(other.x, other.y)
+                    linesDrawn++
+                    if (linesDrawn >= 3) break
+                  }
+                }
+              }
+            }
+          }
           ctx.stroke()
 
-          // Detection Label
-          ctx.font = '10px monospace'
-          ctx.fillStyle = `rgba(24, 23, 22, ${boxAlpha})`
-          ctx.fillRect(faceBox.x, faceBox.y - 18, 140, 16)
-          ctx.fillStyle = `rgba(251, 249, 245, ${boxAlpha})`
-          ctx.fillText('Jasmanjot Singh Sarna', faceBox.x + 5, faceBox.y - 6)
+          // Draw active travelling pulses along network edges
+          if (!dropPulses && fProg < 0.2) {
+            ctx.fillStyle = '#E5633C'
+            for (const pulse of activePulses) {
+              pulse.progress += pulse.speed
+              if (pulse.progress > 1) {
+                pulse.progress = 0
+                pulse.edgeIndex = Math.floor(Math.random() * Math.min(80, edgesRaw.length))
+              }
+              const edge = edgesRaw[pulse.edgeIndex]
+              if (edge) {
+                const p1 = particles[edge[0]]
+                const p2 = particles[edge[1]]
+                if (p1 && p2) {
+                  const px = p1.x + (p2.x - p1.x) * pulse.progress
+                  const py = p1.y + (p2.y - p1.y) * pulse.progress
+                  ctx.beginPath()
+                  ctx.arc(px, py, 2.2, 0, Math.PI * 2)
+                  ctx.fill()
+                }
+              }
+            }
+          }
+        }
 
-          // Facial Landmark Ticks
-          if (!isMobile && modelElapsed > 800) {
-            const lmAlpha = Math.min(1, (modelElapsed - 800) / 300)
-            ctx.fillStyle = `rgba(192, 74, 38, ${lmAlpha * 0.9})`
-            landmarks.forEach((lm) => {
-              ctx.beginPath()
-              ctx.arc(lm.x, lm.y, 2, 0, Math.PI * 2)
-              ctx.fill()
-            })
+        // Phase 2 / 3: Draw precomputed portrait plexus mesh
+        if (fProg > 0.3) {
+          const meshOpacity = Math.min(1, (fProg - 0.3) / 0.7) * state.meshAlpha
+          ctx.strokeStyle = `rgba(251, 249, 245, ${0.2 * meshOpacity})`
+          ctx.beginPath()
+
+          for (let e = 0; e < edgesRaw.length; e++) {
+            const [i, j] = edgesRaw[e]
+            const p1 = particles[i]
+            const p2 = particles[j]
+            if (p1 && p2) {
+              ctx.moveTo(p1.x, p1.y)
+              ctx.lineTo(p2.x, p2.y)
+            }
+          }
+          ctx.stroke()
+        }
+      }
+
+      // 4. Draw Particles (Dots in Accent Color)
+      if (state.meshAlpha > 0.01) {
+        ctx.fillStyle = '#E5633C'
+        for (let i = 0; i < particles.length; i++) {
+          const pt = particles[i]
+          const size = (pt.isLabelNode ? 2.5 : 1.4) * state.meshAlpha
+          ctx.fillRect(pt.x - size / 2, pt.y - size / 2, size, size)
+        }
+      }
+
+      // 5. Draw Resume Skill Labels (Fade out during forming)
+      if (state.labelAlpha > 0.02) {
+        ctx.font = '10px monospace'
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'middle'
+
+        for (let i = 0; i < labelCount; i++) {
+          const pt = particles[i]
+          if (pt.label) {
+            ctx.fillStyle = `rgba(251, 249, 245, ${0.85 * state.labelAlpha})`
+            ctx.fillText(pt.label, pt.x + 8, pt.y)
           }
         }
       }
-      // 3. PRODUCT PHASE (2200 - 3000ms)
-      else if (elapsed < T_TOTAL) {
-        setPhase('product')
-        const prodElapsed = elapsed - T_MODEL_END
-        const curtainProgress = prodElapsed / (T_TOTAL - T_MODEL_END)
 
-        // Draw settled outline
-        particles.forEach((pt) => {
-          ctx.fillStyle = `rgba(192, 74, 38, ${0.8 * (1 - curtainProgress)})`
-          ctx.fillRect(pt.targetX, pt.targetY, pt.size, pt.size)
-        })
-
-        if (curtainProgress > 0.85) {
-          setPhase('curtain')
-        }
-      } else {
-        handleDismiss()
-        return
+      // 6. Real Cutout Photo Reveal (Phase 3: Fades in exactly over settled points)
+      if (state.photoAlpha > 0.01 && profileImgRef.current) {
+        ctx.save()
+        ctx.globalAlpha = state.photoAlpha
+        ctx.drawImage(profileImgRef.current, targetLeft, targetTop, targetSize, targetSize)
+        ctx.restore()
       }
-
-      animFrameRef.current = requestAnimationFrame(render)
     }
 
-    animFrameRef.current = requestAnimationFrame(render)
+    // Register with GSAP ticker
+    gsap.ticker.add(render)
 
+    // Window Resize Handler
     const handleResize = () => {
       width = canvas.width = window.innerWidth
       height = canvas.height = window.innerHeight
+      canvas.width = width * dpr
+      canvas.height = height * dpr
+      ctx.scale(dpr, dpr)
     }
     window.addEventListener('resize', handleResize)
 
-    return () => {
-      cancelAnimationFrame(animFrameRef.current)
-      window.removeEventListener('resize', handleResize)
+    // Visibility Change: pause when tab is hidden to save CPU/battery
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        tl.pause()
+      } else {
+        tl.resume()
+      }
     }
-  }, [mounted, isSkipped, handleDismiss])
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      gsap.ticker.remove(render)
+      tl.kill()
+      window.removeEventListener('resize', handleResize)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [mounted, isSkipped, isRepeat, handleDismiss])
 
   if (!mounted || isSkipped || phase === 'done') return null
 
-  // Fast 0.5s repeat visit mode
+  // Fast 0.5s repeat visit mode (Split curtain only)
   if (isRepeat) {
     return (
       <div
         className="fixed inset-0 z-[99999] pointer-events-none flex flex-col"
         onAnimationEnd={handleDismiss}
+        aria-hidden="true"
       >
         <div className="w-full h-1/2 bg-[#141413] animate-curtain-top" />
         <div className="w-full h-1/2 bg-[#141413] animate-curtain-bottom" />
@@ -291,37 +494,41 @@ export default function Loader({ onComplete }: { onComplete?: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-[99999] select-none flex flex-col justify-between overflow-hidden"
+      className="fixed inset-0 z-[99999] select-none flex flex-col justify-between overflow-hidden bg-[#141413]"
       onClick={handleDismiss}
-      role="dialog"
-      aria-label="Loading portfolio"
+      aria-hidden="true"
     >
-      {/* Canvas for Point Cloud & Detection Animation */}
+      {/* Screen Reader Accessible Live Status */}
+      <span className="sr-only" role="status" aria-live="polite">
+        Loading Jasmanjot Singh Sarna&apos;s Engineering Portfolio
+      </span>
+
+      {/* Main High-Performance 2D Canvas */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 z-10 w-full h-full bg-[#141413]"
       />
 
-      {/* Top Header Information */}
-      <div className="relative z-20 flex items-center justify-between p-6 font-mono text-xs text-[#9E9A92]">
+      {/* Top Header Information & Skip Action */}
+      <div className="relative z-20 flex items-center justify-between p-5 sm:p-6 font-mono text-xs text-[#9E9A92] pointer-events-none">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-          <span className="text-[#ECEAE4] font-semibold">JSS</span>
-          <span>{"//"}</span>
+          <span className="text-[#ECEAE4] font-semibold">JASMANJOT</span>
+          <span>{'//'}</span>
           <span className="uppercase text-[11px]">
-            {phase === 'data' && '01. Raw Data Space'}
-            {phase === 'model' && '02. Feature Localization & Landmark Extraction'}
-            {phase === 'product' && '03. Resolved Model Output'}
-            {phase === 'curtain' && '04. Final Handoff'}
+            {phase === 'network' && '01. Skills Network Awakening'}
+            {phase === 'forming' && '02. Forming Portrait Plexus'}
+            {phase === 'opening' && '03. Continuous Handoff'}
           </span>
         </div>
 
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation()
             handleDismiss()
           }}
-          className="min-h-[44px] min-w-[44px] px-3 py-2 rounded border border-white/20 bg-white/5 text-[#ECEAE4] hover:bg-white/15 text-[12px] font-mono transition-colors flex items-center justify-center"
+          className="pointer-events-auto min-h-[44px] min-w-[44px] px-3.5 py-2 rounded border border-white/20 bg-white/5 text-[#ECEAE4] hover:bg-white/15 text-[12px] font-mono transition-colors flex items-center justify-center cursor-pointer"
           title="Skip intro animation"
           aria-label="Skip intro animation"
         >
@@ -330,17 +537,17 @@ export default function Loader({ onComplete }: { onComplete?: () => void }) {
       </div>
 
       {/* Bottom Stage Narrative */}
-      <div className="relative z-20 flex items-end justify-between p-6 font-mono text-[11px] text-[#9E9A92] border-t border-white/10">
+      <div className="relative z-20 flex items-end justify-between p-5 sm:p-6 font-mono text-[11px] text-[#9E9A92] border-t border-white/10 pointer-events-none">
         <div>
-          <span className="text-accent font-semibold">Sequence:</span> Data &rarr; Model &rarr; Product
+          <span className="text-accent font-semibold">Sequence:</span> Modules &rarr; Network &rarr; Me
         </div>
         <div className="hidden sm:block">
-          Face Emotion Recognition Architecture [MediaPipe &amp; CNNs]
+          AI/ML &bull; Full-Stack Systems &bull; B.Tech CSE 2027
         </div>
       </div>
 
-      {/* Split Curtain Exit Transition */}
-      {phase === 'curtain' && (
+      {/* Split Curtain Exit Transition during Opening Phase */}
+      {phase === 'opening' && (
         <div className="absolute inset-0 z-30 pointer-events-none flex flex-col">
           <div className="w-full h-1/2 bg-[#141413] animate-curtain-top" />
           <div className="w-full h-1/2 bg-[#141413] animate-curtain-bottom" />
@@ -357,10 +564,10 @@ export default function Loader({ onComplete }: { onComplete?: () => void }) {
           100% { transform: translateY(100%); }
         }
         .animate-curtain-top {
-          animation: curtainTop 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation: curtainTop 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
         .animate-curtain-bottom {
-          animation: curtainBottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation: curtainBottom 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
       `}</style>
     </div>
