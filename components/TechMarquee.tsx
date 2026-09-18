@@ -30,11 +30,11 @@ export default function TechMarquee() {
         {/* Pause / Play Control */}
         <button
           onClick={() => setIsPaused(!isPaused)}
-          className="absolute left-4 z-20 p-1.5 rounded bg-paper border border-border text-muted hover:text-ink shadow-xs transition-opacity opacity-0 group-hover:opacity-100 focus:opacity-100"
+          className="absolute left-2 sm:left-4 z-20 min-h-[44px] min-w-[44px] p-2 rounded bg-paper border border-border text-muted hover:text-ink shadow-xs transition-opacity opacity-70 hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 flex items-center justify-center"
           title={isPaused ? 'Resume Marquee' : 'Pause Marquee'}
           aria-label={isPaused ? 'Resume Tech Marquee' : 'Pause Tech Marquee'}
         >
-          {isPaused ? <Play size={12} /> : <Pause size={12} />}
+          {isPaused ? <Play size={14} /> : <Pause size={14} />}
         </button>
 
         {/* Marquee Track (Double duplicate for seamless loop) */}

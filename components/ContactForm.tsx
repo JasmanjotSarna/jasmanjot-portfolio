@@ -79,7 +79,7 @@ export default function ContactForm() {
   }
 
   return (
-    <section id="contact" className="py-16 sm:py-24 border-t border-border relative">
+    <section id="contact" className="scroll-mt-20 sm:scroll-mt-24 py-16 sm:py-24 border-t border-border relative">
       <div className="container-editorial">
         <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 sm:gap-14 items-start">
           {/* Left Column: Direct Communication Channels */}
@@ -241,6 +241,8 @@ export default function ContactForm() {
                       id="contact-name"
                       type="text"
                       required
+                      autoComplete="name"
+                      inputMode="text"
                       value={formData.name}
                       onChange={(e) => {
                         setFormData({ ...formData, name: e.target.value })
@@ -249,7 +251,7 @@ export default function ContactForm() {
                       placeholder="e.g. Maya Chen"
                       aria-invalid={Boolean(fieldErrors.name)}
                       aria-describedby={fieldErrors.name ? 'name-error' : undefined}
-                      className={`w-full px-3.5 py-2.5 rounded-sm border bg-paper text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors ${
+                      className={`w-full px-3.5 py-2.5 rounded-sm border bg-paper text-base sm:text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors ${
                         fieldErrors.name ? 'border-red-500/60' : 'border-border'
                       }`}
                     />
@@ -272,6 +274,8 @@ export default function ContactForm() {
                       id="contact-email"
                       type="email"
                       required
+                      autoComplete="email"
+                      inputMode="email"
                       value={formData.email}
                       onChange={(e) => {
                         setFormData({ ...formData, email: e.target.value })
@@ -280,7 +284,7 @@ export default function ContactForm() {
                       placeholder="maya@company.com"
                       aria-invalid={Boolean(fieldErrors.email)}
                       aria-describedby={fieldErrors.email ? 'email-error' : undefined}
-                      className={`w-full px-3.5 py-2.5 rounded-sm border bg-paper text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors ${
+                      className={`w-full px-3.5 py-2.5 rounded-sm border bg-paper text-base sm:text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors ${
                         fieldErrors.email ? 'border-red-500/60' : 'border-border'
                       }`}
                     />
@@ -304,6 +308,7 @@ export default function ContactForm() {
                     id="contact-message"
                     required
                     rows={4}
+                    autoComplete="off"
                     value={formData.message}
                     onChange={(e) => {
                       setFormData({ ...formData, message: e.target.value })
@@ -312,7 +317,7 @@ export default function ContactForm() {
                     placeholder="Describe the opportunity, technical challenge, or project..."
                     aria-invalid={Boolean(fieldErrors.message)}
                     aria-describedby={fieldErrors.message ? 'message-error' : undefined}
-                    className={`w-full px-3.5 py-2.5 rounded-sm border bg-paper text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors resize-y ${
+                    className={`w-full px-3.5 py-2.5 rounded-sm border bg-paper text-base sm:text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors resize-y ${
                       fieldErrors.message ? 'border-red-500/60' : 'border-border'
                     }`}
                   />

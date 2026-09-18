@@ -36,9 +36,10 @@ export default function Loader({ onComplete }: { onComplete?: () => void }) {
       return
     }
 
-    // 2. Check prefers-reduced-motion
+    // 2. Check prefers-reduced-motion or Save-Data
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reducedMotion) {
+    const saveData = (navigator as unknown as { connection?: { saveData?: boolean } })?.connection?.saveData === true
+    if (reducedMotion || saveData) {
       handleDismiss()
       return
     }
@@ -320,8 +321,9 @@ export default function Loader({ onComplete }: { onComplete?: () => void }) {
             e.stopPropagation()
             handleDismiss()
           }}
-          className="px-2.5 py-1 rounded border border-white/20 bg-white/5 text-[#ECEAE4] hover:bg-white/15 text-[11px] font-mono transition-colors"
+          className="min-h-[44px] min-w-[44px] px-3 py-2 rounded border border-white/20 bg-white/5 text-[#ECEAE4] hover:bg-white/15 text-[12px] font-mono transition-colors flex items-center justify-center"
           title="Skip intro animation"
+          aria-label="Skip intro animation"
         >
           Skip [Esc]
         </button>

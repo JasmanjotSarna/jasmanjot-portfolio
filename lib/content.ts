@@ -76,11 +76,14 @@ export const PERSONAL_INFO = {
   email: 'jasmanjotsinghsarna@gmail.com',
   github: 'https://github.com/JasmanjotSarna',
   linkedin: 'https://www.linkedin.com/in/jasmanjot-singh-sarna-0a2539286/',
-  resumePdf: '/Jasmanjot%20Resume.pdf',
+  resumePdf: '/resume.pdf',
   photo: '/profile.png',
+  lastUpdated: 'September 2026',
   summary:
     "I work across the pipeline: data cleaning and EDA, statistical modeling, LLM/agentic workflows, and full-stack software engineering. I've worked as an AI Full Stack Developer building LLM chatbots and as a Data Analyst Intern building KPI dashboards.",
 }
+
+export const LAST_UPDATED = 'September 2026'
 
 export const PROJECTS: Project[] = [
   {

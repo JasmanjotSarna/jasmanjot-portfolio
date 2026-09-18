@@ -7,9 +7,16 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
   const lenisRef = useRef<Lenis | null>(null)
 
   useEffect(() => {
-    // Check prefers-reduced-motion
+    // 1. Check prefers-reduced-motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReducedMotion) return
+
+    // 2. Check touch device / coarse pointer (native momentum scrolling feels best on mobile)
+    const isTouch = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window
+
+    // 3. Check Save-Data client hint
+    const isSaveData = (navigator as any).connection?.saveData === true
+
+    if (prefersReducedMotion || isTouch || isSaveData) return
 
     const lenis = new Lenis({
       duration: 1.1,
@@ -17,7 +24,6 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       orientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 0.9,
-      touchMultiplier: 1.5,
     })
 
     lenisRef.current = lenis
@@ -29,7 +35,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
 
     const animId = requestAnimationFrame(raf)
 
-    // Intercept internal hash links for smooth scroll
+    // Intercept internal hash links for smooth scroll on desktop
     const handleClick = (e: MouseEvent) => {
       const target = (e.target as HTMLElement).closest('a')
       if (!target) return

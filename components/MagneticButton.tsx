@@ -1,13 +1,13 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 interface MagneticButtonProps {
   children: React.ReactNode
   className?: string
-  strength?: number // Default capped pull strength (0.15)
-  maxOffset?: number // Max pixels offset (default 6px)
+  strength?: number
+  maxOffset?: number
 }
 
 export default function MagneticButton({
@@ -18,16 +18,24 @@ export default function MagneticButton({
 }: MagneticButtonProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [isFinePointer, setIsFinePointer] = useState(false)
+
+  useEffect(() => {
+    const checkPointer = () => {
+      const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+      setIsFinePointer(fine)
+    }
+    checkPointer()
+  }, [])
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return
+    if (!isFinePointer || !ref.current) return
     const { clientX, clientY } = e
     const { left, top, width, height } = ref.current.getBoundingClientRect()
 
     const middleX = clientX - (left + width / 2)
     const middleY = clientY - (top + height / 2)
 
-    // Calculate pull and cap at maxOffset
     const pullX = Math.max(-maxOffset, Math.min(maxOffset, middleX * strength))
     const pullY = Math.max(-maxOffset, Math.min(maxOffset, middleY * strength))
 
@@ -35,7 +43,12 @@ export default function MagneticButton({
   }
 
   const handleMouseLeave = () => {
+    if (!isFinePointer) return
     setPosition({ x: 0, y: 0 })
+  }
+
+  if (!isFinePointer) {
+    return <div className={`inline-block ${className}`}>{children}</div>
   }
 
   return (

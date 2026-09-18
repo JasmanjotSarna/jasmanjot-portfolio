@@ -17,11 +17,11 @@ export default function CustomCursor() {
   const springY = useSpring(mouseY, springConfig)
 
   useEffect(() => {
-    // Only enable on fine pointer (desktop mouse) and when not prefers-reduced-motion
-    const hasFinePointer = window.matchMedia('(pointer: fine)').matches
+    // Only enable on fine pointer (desktop mouse) with hover capability and when not prefers-reduced-motion
+    const hasFineHover = window.matchMedia('(pointer: fine) and (hover: hover)').matches
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    if (!hasFinePointer || reducedMotion) {
+    if (!hasFineHover || reducedMotion) {
       return
     }
 

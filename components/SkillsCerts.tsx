@@ -5,7 +5,7 @@ import { Award, CheckCircle } from 'lucide-react'
 
 export default function SkillsCerts() {
   return (
-    <section id="skills" className="py-12 sm:py-16 border-t border-border">
+    <section id="skills" className="scroll-mt-20 sm:scroll-mt-24 py-12 sm:py-16 border-t border-border">
       <div className="container-editorial">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 sm:gap-14">
           {/* Left Column: Core Technical Skills (Grouped Lists, No Bars) */}

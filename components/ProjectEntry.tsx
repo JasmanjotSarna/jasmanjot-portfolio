@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Project, SHOW_PLACEHOLDERS } from '@/lib/content'
 import { Github, ExternalLink, Video, HelpCircle } from 'lucide-react'
@@ -15,6 +15,15 @@ interface ProjectEntryProps {
 export default function ProjectEntry({ project, index, totalProjects }: ProjectEntryProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const indexStr = String(index + 1).padStart(2, '0')
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px) and (hover: hover)')
+    setIsDesktop(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   // Parallax on the oversized numeral
   const { scrollYProgress } = useScroll({
@@ -35,7 +44,7 @@ export default function ProjectEntry({ project, index, totalProjects }: ProjectE
     <article
       ref={containerRef}
       id={project.id}
-      className={`relative py-12 sm:py-20 ${
+      className={`scroll-mt-20 sm:scroll-mt-24 relative py-12 sm:py-20 ${
         index > 0 ? 'border-t border-border' : ''
       } transition-colors duration-200`}
       data-cursor="Inspect"
@@ -56,13 +65,27 @@ export default function ProjectEntry({ project, index, totalProjects }: ProjectE
         {/* Left Column: Oversized Parallax Numeral & Dates */}
         <div className="relative flex flex-col justify-between">
           <div className="sticky top-24">
-            {/* Oversized Parallax Numeral */}
+            {/* Oversized Parallax Numeral (Decorative Vector Art) */}
             <motion.div
-              style={{ y: numeralY }}
-              className="font-display text-7xl sm:text-8xl lg:text-9xl font-bold text-border select-none pointer-events-none -mb-4 sm:-mb-6 tracking-tighter"
+              style={{ y: isDesktop ? numeralY : 0 }}
+              className="select-none pointer-events-none -mb-4 sm:-mb-6 overflow-visible"
               aria-hidden="true"
             >
-              {indexStr}
+              <svg
+                viewBox="0 0 180 110"
+                className="w-28 sm:w-36 lg:w-44 h-auto text-border overflow-visible"
+                aria-hidden="true"
+                role="presentation"
+              >
+                <text
+                  x="0"
+                  y="92"
+                  fill="currentColor"
+                  style={{ fontFamily: 'var(--font-display), Georgia, serif', fontWeight: 700, fontSize: '100px', letterSpacing: '-0.06em' }}
+                >
+                  {indexStr}
+                </text>
+              </svg>
             </motion.div>
 
             <div className="flex flex-col gap-1">
@@ -108,7 +131,7 @@ export default function ProjectEntry({ project, index, totalProjects }: ProjectE
                   <span className="font-mono text-xs text-ink font-semibold uppercase tracking-wider">
                     How it works // {project.architectureOverview.label}
                   </span>
-                  <span className="font-mono text-[10px] text-accent bg-accent-subtle px-1.5 py-0.5 rounded border border-accent-border">
+                  <span className="font-mono text-[10px] text-ink font-medium bg-accent-subtle px-1.5 py-0.5 rounded border border-accent-border">
                     Simplified Overview
                   </span>
                 </div>

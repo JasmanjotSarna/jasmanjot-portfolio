@@ -167,7 +167,7 @@ export default function AgentPipeline() {
   const Icon = activeStage.icon
 
   return (
-    <section id="proof-piece" className="py-14 sm:py-20 border-t border-border bg-paper relative">
+    <section id="proof-piece" className="scroll-mt-20 sm:scroll-mt-24 py-14 sm:py-20 border-t border-border bg-paper relative">
       <div className="container-editorial">
         {/* Section Header */}
         <div className="mb-8 sm:mb-12">
@@ -205,39 +205,39 @@ export default function AgentPipeline() {
               </span>
 
               {/* Stepper Controls */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-                  className="p-1.5 sm:px-2.5 sm:py-1.5 rounded border border-border bg-paper text-muted hover:text-ink hover:bg-surface-hover transition-colors font-mono text-xs flex items-center gap-1"
+                  className="min-h-[44px] min-w-[44px] px-3 py-2 rounded border border-border bg-paper text-muted hover:text-ink hover:bg-surface-hover transition-colors font-mono text-xs flex items-center justify-center gap-1.5"
                   title={isAutoPlaying ? 'Pause Auto-Advance' : 'Auto-Advance Stages'}
                   aria-label={isAutoPlaying ? 'Pause auto-advance' : 'Auto-advance stages'}
                 >
-                  {isAutoPlaying ? <Pause size={12} /> : <Play size={12} />}
+                  {isAutoPlaying ? <Pause size={13} /> : <Play size={13} />}
                   <span className="hidden sm:inline">{isAutoPlaying ? 'Pause' : 'Auto'}</span>
                 </button>
 
                 <button
                   onClick={handlePrev}
-                  className="p-1.5 rounded border border-border bg-paper text-muted hover:text-ink hover:bg-surface-hover transition-colors"
+                  className="min-h-[44px] min-w-[44px] p-2 rounded border border-border bg-paper text-muted hover:text-ink hover:bg-surface-hover transition-colors flex items-center justify-center"
                   title="Previous Agent (Left Arrow)"
                   aria-label="Previous Agent Stage"
                 >
-                  <ChevronLeft size={14} />
+                  <ChevronLeft size={16} />
                 </button>
 
                 <button
                   onClick={handleNext}
-                  className="p-1.5 rounded border border-border bg-paper text-muted hover:text-ink hover:bg-surface-hover transition-colors"
+                  className="min-h-[44px] min-w-[44px] p-2 rounded border border-border bg-paper text-muted hover:text-ink hover:bg-surface-hover transition-colors flex items-center justify-center"
                   title="Next Agent (Right Arrow)"
                   aria-label="Next Agent Stage"
                 >
-                  <ChevronRight size={14} />
+                  <ChevronRight size={16} />
                 </button>
               </div>
             </div>
 
             {/* 4 Connected Agent Stage Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 relative">
+            <div role="tablist" aria-label="Agent pipeline stages" className="grid grid-cols-2 md:grid-cols-4 gap-3 relative">
               {AGENT_STAGES.map((stage, idx) => {
                 const StageIcon = stage.icon
                 const isActive = idx === activeStageIndex
@@ -253,7 +253,7 @@ export default function AgentPipeline() {
                       className={`w-full p-3 sm:p-4 rounded text-left transition-all duration-300 border ${
                         isActive
                           ? 'bg-paper text-ink border-accent shadow-xs scale-102 z-10'
-                          : 'bg-paper/60 text-muted border-border/80 opacity-60 hover:opacity-100'
+                          : 'bg-surface text-ink/80 border-border hover:border-accent/40'
                       }`}
                       role="tab"
                       aria-selected={isActive}

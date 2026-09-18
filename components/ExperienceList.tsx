@@ -7,7 +7,7 @@ export default function ExperienceList() {
   return (
     <section
       id="experience"
-      className="py-16 sm:py-24 border-y border-border bg-surface/40 text-ink transition-colors duration-200 relative overflow-hidden"
+      className="scroll-mt-20 sm:scroll-mt-24 py-16 sm:py-24 border-y border-border bg-surface/40 text-ink transition-colors duration-200 relative overflow-hidden"
     >
       {/* Corner Crop Marks for Print Proof Contrast */}
       <div className="absolute top-4 left-6 font-mono text-[10px] text-muted/50 select-none hidden sm:block">

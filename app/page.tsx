@@ -14,7 +14,7 @@ import { PROJECTS } from '@/lib/content'
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-paper text-ink transition-colors duration-200 relative">
+    <div className="min-h-screen flex flex-col bg-paper text-ink transition-colors duration-200 relative w-full max-w-full overflow-x-clip">
       {/* Static Subtle Paper Grain Overlay */}
       <div className="paper-grain" aria-hidden="true" />
 
@@ -30,7 +30,7 @@ export default function Home() {
       {/* Editorial Sticky Masthead Header */}
       <Header />
 
-      <main className="flex-1">
+      <main className="flex-1 min-w-0 w-full overflow-x-clip">
         {/* Recruiter-Optimized Above-the-fold Hero with Masked Reveal & Ticker */}
         <Hero />
 
@@ -38,7 +38,7 @@ export default function Home() {
         <TechMarquee />
 
         {/* Projects: 4 Entries with Stacking Parallax Numerals */}
-        <section id="projects" className="py-16 sm:py-24 relative">
+        <section id="projects" className="scroll-mt-20 sm:scroll-mt-24 py-16 sm:py-24 relative">
           <div className="container-editorial">
             {/* Section Header */}
             <div className="mb-12 sm:mb-16">
