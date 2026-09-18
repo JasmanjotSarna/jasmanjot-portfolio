@@ -76,7 +76,7 @@ export const PERSONAL_INFO = {
   email: 'jasmanjotsinghsarna@gmail.com',
   github: 'https://github.com/JasmanjotSarna',
   linkedin: 'https://www.linkedin.com/in/jasmanjot-singh-sarna-0a2539286/',
-  resumePdf: '/resume.pdf',
+  resumePdf: '/Jasmanjot%20Resume.pdf',
   photo: '/profile.png',
   lastUpdated: 'September 2026',
   summary:

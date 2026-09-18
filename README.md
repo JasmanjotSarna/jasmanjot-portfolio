@@ -104,7 +104,6 @@ The application is architected to build statically without requiring secrets at 
 
 - **Portrait Cutout**: [`/public/profile.png`](./public/profile.png) — Transparent-background cutout used for the hero portrait and Poisson-disc network formation.
 - **Resume Documents**:
-  - [`/public/resume.pdf`](./public/resume.pdf) — Standard direct link for all header, hero, and footer download buttons.
   - [`/public/Jasmanjot Resume.pdf`](./public/Jasmanjot%20Resume.pdf) — Master resume copy.
 - **Portrait Point Cloud**: [`/public/portrait-points.json`](./public/portrait-points.json) — Precomputed Poisson-disc coordinates and neighbor edges.
 

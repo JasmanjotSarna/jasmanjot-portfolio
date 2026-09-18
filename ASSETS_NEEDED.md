@@ -6,8 +6,8 @@ This document contains developer-side action items, optional assets to supply, a
 
 ## 1. Resume Documents Status (Ready)
 
-- [x] **`/public/resume.pdf` and `/public/Jasmanjot Resume.pdf`**:
-  - The latest resume PDF is bundled at both `/public/resume.pdf` (standard kebab-case endpoint for website download buttons) and `/public/Jasmanjot Resume.pdf` (original title).
+- [x] **`/public/Jasmanjot Resume.pdf` and `/public/Jasmanjot Resume.pdf`**:
+  - The latest resume PDF is bundled at both `/public/Jasmanjot Resume.pdf` (standard kebab-case endpoint for website download buttons) and `/public/Jasmanjot Resume.pdf` (original title).
   - All download triggers across Header, Hero, and Footer are wired directly to `/resume.pdf`.
 
 ---
