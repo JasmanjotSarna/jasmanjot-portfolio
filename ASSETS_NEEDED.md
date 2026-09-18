@@ -1,15 +1,14 @@
 # Master Action Items & Assets Checklist for Jasmanjot
 
-This document contains all developer-side action items, assets to supply, and production deployment configuration for **jasmanjot-portfolio**.
+This document contains developer-side action items, optional assets to supply, and production deployment configuration for **jasmanjot-portfolio**.
 
 ---
 
-## 1. Resume PDF (Immediate Action Item)
+## 1. Resume Documents Status (Ready)
 
-- [ ] **Replace `/public/resume.pdf`**:
-  - The file currently at `/public/resume.pdf` still refers to the SaaS platform as "CareerForge AI".
-  - **Action**: Export an updated PDF from your resume builder with the official name **"CareerOS"**, rename the file to `resume.pdf`, and place it in `/public/resume.pdf` (overwriting the existing file).
-  - The website's master download buttons, hero links, and mobile action bars are already wired to `/resume.pdf`.
+- [x] **`/public/resume.pdf` and `/public/Jasmanjot Resume.pdf`**:
+  - The latest resume PDF is bundled at both `/public/resume.pdf` (standard kebab-case endpoint for website download buttons) and `/public/Jasmanjot Resume.pdf` (original title).
+  - All download triggers across Header, Hero, and Footer are wired directly to `/resume.pdf`.
 
 ---
 
@@ -33,7 +32,7 @@ Add these environment variables in your **Vercel Project Dashboard** under **Set
 
 ---
 
-## 3. Project Links & Media Assets
+## 3. Project Links & Media Assets (Optional)
 
 All project metadata is centralized in [`lib/content.ts`](./lib/content.ts). When you are ready to publish links or recordings, update the respective objects:
 

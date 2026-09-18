@@ -6,15 +6,23 @@ Designed mobile-first with an editorial aesthetic, fluid typography, zero layout
 
 ---
 
-## Technical Stack & Architecture
+## Technical Highlights & Architecture
 
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router, Server Components & Route Handlers)
-- **Language**: TypeScript 5 (Strict type checking)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with a curated CSS custom property design system (`#FBF9F5` warm paper, `#141413` obsidian ink, `#B5421E` terracotta accent)
-- **Motion & Physics**: [Framer Motion](https://www.framer.com/motion/) for micro-interactions and stage transitions; [GSAP](https://gsap.com/) for scroll choreography; HTML5 Canvas for the point-cloud silhouette loader
+- **Language**: TypeScript 5 (Strict type checking, zero `any`)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with an editorial CSS custom property design system (`#FBF9F5` warm paper, `#141413` obsidian ink, `#B5421E` terracotta accent)
+- **Cinematic Loader ("Modules → Network → Me")**:
+  - Custom HTML5 2D Canvas component powered by a single `gsap.ticker` loop.
+  - **Stage 1 (0–0.9s)**: 14 resume-verified skill nodes (`Python`, `OpenAI API`, `LangChain`, `RAG`, `PyTorch`, `TensorFlow`, `Scikit-Learn`, `OpenCV`, `Pandas`, `SQL`, `Power BI`, `Next.js`, `NestJS`, `PostgreSQL`) awaken with dynamic signal pulses.
+  - **Stage 2 (0.9–2.3s)**: Points ease into Poisson-disc sampled portrait coordinates, forming a plexus-style mesh of Jasmanjot's face and silhouette.
+  - **Stage 3 (2.3–3.0s)**: Authentic transparent cutout photo dissolves into place, smoothly morphing into the hero position as a shared element while the obsidian curtain vertically splits open.
+  - **Performance**: 58 FPS on 4x CPU throttle; 0 Axe-core accessibility violations; instant skip via `[Esc]`, click, or visible button; 0.5s curtain for repeat visits; `prefers-reduced-motion` and `?noloader` fallbacks.
+- **Portrait Sampling Pipeline** (`scripts/generate-portrait-points.mjs`):
+  - Uses `sharp` to parse `public/profile.png` with alpha channel masking ($\alpha > 35$) and a 2D Sobel edge gradient operator.
+  - Generates 1,150 desktop points and 460 mobile points with Poisson-disc spatial constraints, precomputing 1,704 desktop neighbor edges for $O(1)$ runtime rendering.
 - **Backend & Database**: Next.js Server Route Handler (`/api/contact`), [Supabase](https://supabase.com/) Postgres for persistent message storage, [Resend](https://resend.com/) for email delivery
-- **Validation & Rate Limiting**: [Zod](https://zod.dev/) client/server schema validation; [Upstash](https://upstash.com/) Redis distributed sliding-window rate limiter with fallback to database/memory limiters
-- **Accessibility & Device Support**: WCAG 2.1 AA compliant (0 Axe-core violations); automated 18-viewport device matrix verification via [Playwright](https://playwright.dev/)
+- **Validation & Security**: [Zod](https://zod.dev/) schema validation, honeypot spam traps, SHA-256 IP hashing, [Upstash](https://upstash.com/) Redis distributed sliding-window rate limiting with in-memory fallback
+- **Accessibility & Devices**: WCAG 2.1 AA compliant; 18-viewport device matrix verified via [Playwright](https://playwright.dev/) across phones, tablets, and ultra-wide desktops
 
 ---
 
@@ -58,12 +66,15 @@ npm install
 npm run dev
 
 # 4. Open in browser
-# Visit http://localhost:3000
+# Visit http://localhost:3000 (or http://localhost:3000?noloader to bypass loader)
 ```
 
-### Type Checking & Build Verification
+### Build Scripts & Tooling
 
 ```bash
+# Re-generate portrait Poisson-disc sampling points from public/profile.png
+npm run generate:points
+
 # Run strict TypeScript compilation check
 npx tsc --noEmit
 
@@ -84,12 +95,24 @@ The application is architected to build statically without requiring secrets at 
 2. Log into [Vercel](https://vercel.com) and click **"Add New..." &rarr; "Project"**.
 3. Select the **`jasmanjot-portfolio`** repository.
 4. Framework preset **Next.js** is automatically detected with root directory `./`.
-5. *(Optional for contact form backend)*: Add the runtime environment variables (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`) as documented in [ASSETS_NEEDED.md](./ASSETS_NEEDED.md).
+5. *(Optional for contact form backend)*: Add runtime environment variables (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`) as documented in [ASSETS_NEEDED.md](./ASSETS_NEEDED.md).
 6. Click **Deploy**.
+
+---
+
+## Static Assets & Resume
+
+- **Portrait Cutout**: [`/public/profile.png`](./public/profile.png) — Transparent-background cutout used for the hero portrait and Poisson-disc network formation.
+- **Resume Documents**:
+  - [`/public/resume.pdf`](./public/resume.pdf) — Standard direct link for all header, hero, and footer download buttons.
+  - [`/public/Jasmanjot Resume.pdf`](./public/Jasmanjot%20Resume.pdf) — Master resume copy.
+- **Portrait Point Cloud**: [`/public/portrait-points.json`](./public/portrait-points.json) — Precomputed Poisson-disc coordinates and neighbor edges.
 
 ---
 
 ## Internal Documentation
 
 - [`ASSETS_NEEDED.md`](./ASSETS_NEEDED.md): Personal checklist for resume updates, optional links, and runtime environment variable keys.
+- [`BACKEND_SETUP.md`](./BACKEND_SETUP.md): Step-by-step Supabase, Resend, and Upstash setup instructions.
+- [`MOTION.md`](./MOTION.md): Motion choreography specifications and easing curves.
 - [`supabase/schema.sql`](./supabase/schema.sql): PostgreSQL schema and Row Level Security policies for the contact form messages table.
