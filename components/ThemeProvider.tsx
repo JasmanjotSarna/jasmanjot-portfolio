@@ -19,9 +19,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = window.localStorage.getItem('theme') as Theme | null
-    const initial = stored ?? 'light'
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const initial = stored ?? (prefersDark ? 'dark' : 'light')
     setTheme(initial)
     document.documentElement.setAttribute('data-theme', initial)
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!window.localStorage.getItem('theme')) {
+        const newTheme = e.matches ? 'dark' : 'light'
+        setTheme(newTheme)
+        document.documentElement.setAttribute('data-theme', newTheme)
+      }
+    }
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
   const toggle = (e?: React.MouseEvent) => {

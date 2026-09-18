@@ -73,11 +73,11 @@ export default function CustomCursor() {
           width: cursorText ? 'auto' : isHovered ? 28 : 8,
           height: cursorText ? 24 : isHovered ? 28 : 8,
           backgroundColor: cursorText
-            ? '#C04A26'
+            ? 'var(--accent)'
             : isHovered
-            ? 'rgba(192, 74, 38, 0.2)'
-            : '#C04A26',
-          borderColor: isHovered ? '#C04A26' : 'transparent',
+            ? 'var(--accent-subtle)'
+            : 'var(--accent)',
+          borderColor: isHovered ? 'var(--accent)' : 'transparent',
           borderWidth: isHovered && !cursorText ? 1.5 : 0,
           paddingLeft: cursorText ? 10 : 0,
           paddingRight: cursorText ? 10 : 0,

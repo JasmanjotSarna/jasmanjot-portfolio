@@ -46,7 +46,7 @@ export default function Home() {
                 Projects
               </div>
               <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-ink tracking-tight mb-3">
-                Four projects, so far
+                Top Projects
               </h2>
               <p className="text-sm sm:text-base text-muted max-w-2xl leading-relaxed">
                 A full-stack SaaS platform, a multi-agent research pipeline, a computer vision model, and a regression project.
