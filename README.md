@@ -234,7 +234,4 @@ Live website:
 
 If you find my work interesting or useful, consider giving my repositories a ⭐ on GitHub.
 
----
 
-
-```
