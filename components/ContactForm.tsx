@@ -1,27 +1,134 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useId } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { PERSONAL_INFO } from '@/lib/content'
-import { contactSchema } from '@/lib/contact-schema'
-import { Mail, FileDown, Send, CheckCircle2, AlertCircle, ArrowUpRight, Loader2 } from 'lucide-react'
+import { contactSchema, INQUIRY_TYPES, InquiryType } from '@/lib/contact-schema'
+import {
+  Mail,
+  FileDown,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+  ArrowUpRight,
+  Loader2,
+  Briefcase,
+  Code2,
+  GraduationCap,
+  Building2,
+  HelpCircle,
+  Copy,
+  Check,
+} from 'lucide-react'
+
+interface InquiryOption {
+  type: InquiryType
+  label: string
+  shortLabel: string
+  icon: typeof Briefcase
+  orgLabel: string
+  orgPlaceholder: string
+  showRole: boolean
+  messagePlaceholder: string
+}
+
+const INQUIRY_CONFIG: Record<InquiryType, InquiryOption> = {
+  career: {
+    type: 'career',
+    label: 'Career opportunity / Recruitment',
+    shortLabel: 'Career / Hiring',
+    icon: Briefcase,
+    orgLabel: 'Company / Organization',
+    orgPlaceholder: 'e.g. DeepMind, Microsoft, Startup',
+    showRole: true,
+    messagePlaceholder:
+      'Tell me about the role, team focus, tech stack, and timeline for hiring...',
+  },
+  freelance: {
+    type: 'freelance',
+    label: 'Freelance project / Collaboration',
+    shortLabel: 'Freelance / Collab',
+    icon: Code2,
+    orgLabel: 'Company, Startup, or Brand',
+    orgPlaceholder: 'e.g. Studio, Startup, Project Name',
+    showRole: false,
+    messagePlaceholder:
+      'Describe the project scope, technical requirements, deliverables, and estimated timeline...',
+  },
+  student: {
+    type: 'student',
+    label: 'Student / Learning / Networking',
+    shortLabel: 'Student / Network',
+    icon: GraduationCap,
+    orgLabel: 'College / University / Community',
+    orgPlaceholder: 'e.g. University, Tech Club, Research Group',
+    showRole: false,
+    messagePlaceholder:
+      'What topic would you like to discuss, explore, or build together?...',
+  },
+  business: {
+    type: 'business',
+    label: 'Business inquiry / Partnership',
+    shortLabel: 'Business / Partner',
+    icon: Building2,
+    orgLabel: 'Company or Entity Name',
+    orgPlaceholder: 'e.g. Organization, Product, Enterprise',
+    showRole: true,
+    messagePlaceholder:
+      'Share details regarding your partnership proposal, API integration, or business inquiry...',
+  },
+  other: {
+    type: 'other',
+    label: 'Other inquiry',
+    shortLabel: 'General Note',
+    icon: HelpCircle,
+    orgLabel: 'Organization (Optional)',
+    orgPlaceholder: 'e.g. Organization or Affiliation',
+    showRole: false,
+    messagePlaceholder: 'How can I assist or collaborate with you?...',
+  },
+}
+
+const CAREER_ROLE_OPTIONS = [
+  'Recruiter / Talent Partner',
+  'Hiring Manager',
+  'Founder / CEO',
+  'Engineering Lead',
+  'Other',
+]
 
 export default function ContactForm() {
+  const [inquiryType, setInquiryType] = useState<InquiryType>('career')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    organization: '',
+    role: '',
     message: '',
-    website: '', // Honeypot field
+    website: '', // Honeypot field for spam prevention
   })
+
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [serverError, setServerError] = useState<string | null>(null)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [copied, setCopied] = useState(false)
+  const [submittedMessageId, setSubmittedMessageId] = useState<string | null>(null)
+
+  const activeConfig = INQUIRY_CONFIG[inquiryType]
 
   const handleCopyEmail = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(PERSONAL_INFO.email)
       setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      setTimeout(() => setCopied(false), 2200)
+    }
+  }
+
+  const handleInquiryChange = (type: InquiryType) => {
+    setInquiryType(type)
+    // Clear inquiry-specific errors when user changes category
+    if (fieldErrors.inquiryType) {
+      setFieldErrors((prev) => ({ ...prev, inquiryType: '' }))
     }
   }
 
@@ -30,8 +137,13 @@ export default function ContactForm() {
     setFieldErrors({})
     setServerError(null)
 
+    const payload = {
+      ...formData,
+      inquiryType,
+    }
+
     // 1. Client-side Zod validation
-    const clientValidation = contactSchema.safeParse(formData)
+    const clientValidation = contactSchema.safeParse(payload)
     if (!clientValidation.success) {
       const errors: Record<string, string> = {}
       clientValidation.error.issues.forEach((issue) => {
@@ -49,7 +161,7 @@ export default function ContactForm() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
 
       const data = await res.json()
@@ -66,23 +178,35 @@ export default function ContactForm() {
         throw new Error(data.error || 'Unable to deliver message right now.')
       }
 
+      setSubmittedMessageId(data.messageId || null)
       setStatus('success')
-      // Reset form fields on successful delivery only
-      setFormData({ name: '', email: '', message: '', website: '' })
+      // Reset form fields on successful persistence only
+      setFormData({
+        name: '',
+        email: '',
+        organization: '',
+        role: '',
+        message: '',
+        website: '',
+      })
     } catch (err: any) {
       setStatus('error')
       setServerError(
-        err.message || 'Unable to deliver message. Please email directly at jasmanjotsinghsarna@gmail.com'
+        err.message ||
+          'Unable to deliver message. Please reach out directly at jasmanjotsinghsarna@gmail.com'
       )
-      // Note: Message and name are intentionally preserved so user does not lose their typed text!
+      // Entered text is intentionally preserved on failure so user does not lose their message!
     }
   }
 
   return (
-    <section id="contact" className="scroll-mt-20 sm:scroll-mt-24 py-16 sm:py-24 border-t border-border relative">
+    <section
+      id="contact"
+      className="scroll-mt-20 sm:scroll-mt-24 py-16 sm:py-24 border-t border-border bg-paper relative overflow-hidden"
+    >
       <div className="container-editorial">
-        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 sm:gap-14 items-start">
-          {/* Left Column: Direct Communication Channels */}
+        <div className="grid lg:grid-cols-[0.88fr_1.12fr] gap-10 sm:gap-14 items-start">
+          {/* Left Column: Direct Communication Channels & Status */}
           <div>
             <div className="font-mono text-xs text-accent font-semibold tracking-wider uppercase mb-2">
               Communication // Channel 01
@@ -91,15 +215,16 @@ export default function ContactForm() {
               Get in Touch
             </h2>
             <p className="text-sm sm:text-base text-muted leading-relaxed mb-8">
-              I am open to full-time AI/ML engineering, full-stack, and data roles starting upon graduation in 2027,
-              as well as high-impact remote internships and collaborative research.
+              I am open to full-time AI/ML engineering, full-stack systems, and data science roles starting
+              upon graduation in 2027, as well as high-impact remote internships, freelance collaborations,
+              and technical research.
             </p>
 
             <div className="space-y-4">
-              {/* Primary Email Card with Copy-to-Clipboard */}
-              <div className="p-4 rounded-sm border border-border bg-surface flex items-center justify-between gap-3">
-                <div className="overflow-hidden">
-                  <span className="font-mono text-xs text-muted uppercase tracking-wider block mb-1">
+              {/* Primary Email Card with Quick Copy */}
+              <div className="p-4 sm:p-5 rounded-sm border border-border bg-surface flex items-center justify-between gap-3 shadow-xs">
+                <div className="overflow-hidden min-w-0">
+                  <span className="font-mono text-[11px] text-muted uppercase tracking-wider block mb-1">
                     Direct Email
                   </span>
                   <a
@@ -115,26 +240,29 @@ export default function ContactForm() {
                 <button
                   type="button"
                   onClick={handleCopyEmail}
-                  className="p-2 rounded border border-border bg-paper text-muted hover:text-ink hover:bg-surface text-xs font-mono transition-all flex items-center gap-1 flex-shrink-0"
+                  className="px-2.5 py-1.5 rounded border border-border bg-paper text-muted hover:text-ink hover:bg-surface text-xs font-mono transition-all flex items-center gap-1.5 flex-shrink-0"
                   data-cursor="Copy"
                   title="Copy email address"
                   aria-label="Copy email address"
                 >
                   {copied ? (
-                    <span className="text-accent flex items-center gap-1 text-[11px] font-semibold">
-                      <CheckCircle2 size={13} />
+                    <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-semibold">
+                      <Check size={13} />
                       <span>Copied!</span>
                     </span>
                   ) : (
-                    <span>Copy</span>
+                    <>
+                      <Copy size={13} />
+                      <span>Copy</span>
+                    </>
                   )}
                 </button>
               </div>
 
-              {/* Master Resume PDF */}
-              <div className="p-4 rounded-sm border border-border bg-surface">
-                <span className="font-mono text-xs text-muted uppercase tracking-wider block mb-1">
-                  Master Resume (PDF)
+              {/* Master Resume PDF Download Card */}
+              <div className="p-4 sm:p-5 rounded-sm border border-border bg-surface shadow-xs">
+                <span className="font-mono text-[11px] text-muted uppercase tracking-wider block mb-1">
+                  Verified Dossier
                 </span>
                 <a
                   href={PERSONAL_INFO.resumePdf}
@@ -143,15 +271,15 @@ export default function ContactForm() {
                   className="font-mono text-sm sm:text-base text-ink font-semibold hover:text-accent transition-colors flex items-center gap-1.5 link-draw"
                   data-cursor="Resume"
                 >
-                  <FileDown size={16} className="text-accent" />
-                  <span>Download Jasmanjot Resume (PDF)</span>
+                  <FileDown size={16} className="text-accent flex-shrink-0" />
+                  <span>Download Master Resume (PDF)</span>
                 </a>
               </div>
 
-              {/* Profiles */}
-              <div className="p-4 rounded-sm border border-border bg-surface">
-                <span className="font-mono text-xs text-muted uppercase tracking-wider block mb-1">
-                  Verified Profiles
+              {/* Profiles Row */}
+              <div className="p-4 sm:p-5 rounded-sm border border-border bg-surface shadow-xs">
+                <span className="font-mono text-[11px] text-muted uppercase tracking-wider block mb-1">
+                  Profiles &amp; Code
                 </span>
                 <div className="flex items-center gap-4 mt-1 font-mono text-sm">
                   <a
@@ -164,7 +292,7 @@ export default function ContactForm() {
                     <span>GitHub</span>
                     <ArrowUpRight size={13} />
                   </a>
-                  <span>•</span>
+                  <span className="text-border">•</span>
                   <a
                     href={PERSONAL_INFO.linkedin}
                     target="_blank"
@@ -180,42 +308,52 @@ export default function ContactForm() {
             </div>
           </div>
 
-          {/* Right Column: Working Contact Form */}
-          <div className="p-6 sm:p-8 rounded-sm border border-border bg-surface shadow-xs relative">
-            <h3 className="font-display font-semibold text-xl sm:text-2xl text-ink mb-1">
-              Send a Direct Message
-            </h3>
-            <p className="font-mono text-xs text-muted mb-6">
-              Validated and delivered directly to jasmanjotsinghsarna@gmail.com
-            </p>
+          {/* Right Column: Premium Recruiter & Client Contact Form */}
+          <div className="p-5 sm:p-8 rounded-sm border border-border bg-surface shadow-xs relative">
+            <div className="mb-6">
+              <h3 className="font-display font-semibold text-xl sm:text-2xl text-ink mb-1">
+                Send a Direct Inquiry
+              </h3>
+              <p className="font-mono text-xs text-muted">
+                Persisted securely to database &amp; delivered to Jasmanjot&apos;s primary inbox.
+              </p>
+            </div>
 
             {/* Success State */}
             {status === 'success' ? (
-              <div
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
                 role="status"
                 aria-live="polite"
-                className="p-8 rounded-sm border border-accent/40 bg-accent-subtle text-center flex flex-col items-center"
+                className="p-8 sm:p-10 rounded-sm border border-accent/40 bg-accent-subtle/40 text-center flex flex-col items-center"
               >
                 <div className="w-12 h-12 rounded-full bg-paper border border-accent/40 flex items-center justify-center text-accent mb-3 shadow-xs">
                   <CheckCircle2 size={24} />
                 </div>
                 <h4 className="font-display font-semibold text-xl text-ink mb-2">
-                  Got it. I&apos;ll reply within a couple of days.
+                  Inquiry Received &amp; Logged
                 </h4>
-                <p className="text-xs font-mono text-muted max-w-sm leading-relaxed mb-5">
-                  Thank you for reaching out. A confirmation has been logged and sent to Jasmanjot.
+                <p className="text-xs sm:text-sm font-sans text-ink/90 max-w-md leading-relaxed mb-2">
+                  Thank you for reaching out. Your message has been safely persisted and delivered to
+                  Jasmanjot. I typically reply within 24–48 hours.
                 </p>
+                {submittedMessageId && (
+                  <p className="font-mono text-[11px] text-muted mb-6">
+                    Reference ID: <code className="bg-paper px-1.5 py-0.5 rounded border border-border">{submittedMessageId}</code>
+                  </p>
+                )}
                 <button
                   type="button"
                   onClick={() => setStatus('idle')}
-                  className="btn-secondary text-xs py-1.5 px-3.5"
+                  className="btn-secondary text-xs py-2 px-4"
                 >
                   Send another note
                 </button>
-              </div>
+              </motion.div>
             ) : (
               <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                {/* Honeypot field (hidden from real users, traps spam bots) */}
+                {/* Honeypot field (hidden from humans, traps automated bot submissions) */}
                 <input
                   type="text"
                   name="website"
@@ -227,7 +365,45 @@ export default function ContactForm() {
                   aria-hidden="true"
                 />
 
-                {/* Name & Email Row */}
+                {/* 1. Inquiry Type Selector Tabs */}
+                <div>
+                  <label className="block font-mono text-xs text-muted uppercase tracking-wider mb-2">
+                    Inquiry Type <span className="text-accent">*</span>
+                  </label>
+                  <div
+                    role="radiogroup"
+                    aria-label="Inquiry Type"
+                    className="grid grid-cols-2 sm:grid-cols-3 gap-2"
+                  >
+                    {INQUIRY_TYPES.map((type) => {
+                      const cfg = INQUIRY_CONFIG[type]
+                      const Icon = cfg.icon
+                      const isSelected = inquiryType === type
+
+                      return (
+                        <button
+                          key={type}
+                          type="button"
+                          role="radio"
+                          aria-checked={isSelected}
+                          onClick={() => handleInquiryChange(type)}
+                          className={`p-2.5 rounded text-left transition-all border flex items-center gap-2 ${
+                            isSelected
+                              ? 'bg-paper text-ink border-accent shadow-xs'
+                              : 'bg-paper/50 text-muted hover:text-ink hover:bg-paper border-border'
+                          }`}
+                        >
+                          <Icon size={14} className={isSelected ? 'text-accent' : 'text-muted'} />
+                          <span className="font-mono text-xs font-medium truncate">
+                            {cfg.shortLabel}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* 2. Name & Email Row */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   {/* Name Input */}
                   <div>
@@ -235,14 +411,13 @@ export default function ContactForm() {
                       htmlFor="contact-name"
                       className="block font-mono text-xs text-muted uppercase tracking-wider mb-1.5"
                     >
-                      Your Name <span className="text-accent">*</span>
+                      Full Name <span className="text-accent">*</span>
                     </label>
                     <input
                       id="contact-name"
                       type="text"
                       required
                       autoComplete="name"
-                      inputMode="text"
                       value={formData.name}
                       onChange={(e) => {
                         setFormData({ ...formData, name: e.target.value })
@@ -252,7 +427,7 @@ export default function ContactForm() {
                       aria-invalid={Boolean(fieldErrors.name)}
                       aria-describedby={fieldErrors.name ? 'name-error' : undefined}
                       className={`w-full px-3.5 py-2.5 rounded-sm border bg-paper text-base sm:text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors ${
-                        fieldErrors.name ? 'border-red-500/60' : 'border-border'
+                        fieldErrors.name ? 'border-red-500/70' : 'border-border'
                       }`}
                     />
                     {fieldErrors.name && (
@@ -268,7 +443,7 @@ export default function ContactForm() {
                       htmlFor="contact-email"
                       className="block font-mono text-xs text-muted uppercase tracking-wider mb-1.5"
                     >
-                      Your Email <span className="text-accent">*</span>
+                      Email Address <span className="text-accent">*</span>
                     </label>
                     <input
                       id="contact-email"
@@ -285,7 +460,7 @@ export default function ContactForm() {
                       aria-invalid={Boolean(fieldErrors.email)}
                       aria-describedby={fieldErrors.email ? 'email-error' : undefined}
                       className={`w-full px-3.5 py-2.5 rounded-sm border bg-paper text-base sm:text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors ${
-                        fieldErrors.email ? 'border-red-500/60' : 'border-border'
+                        fieldErrors.email ? 'border-red-500/70' : 'border-border'
                       }`}
                     />
                     {fieldErrors.email && (
@@ -296,29 +471,103 @@ export default function ContactForm() {
                   </div>
                 </div>
 
-                {/* Message Textarea */}
+                {/* 3. Dynamic Organization Field (Conditional Label based on Inquiry Type) */}
+                {inquiryType !== 'other' && (
+                  <div>
+                    <label
+                      htmlFor="contact-org"
+                      className="block font-mono text-xs text-muted uppercase tracking-wider mb-1.5"
+                    >
+                      {activeConfig.orgLabel} <span className="text-muted/60 text-[10px] lowercase">(optional)</span>
+                    </label>
+                    <input
+                      id="contact-org"
+                      type="text"
+                      autoComplete="organization"
+                      value={formData.organization}
+                      onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
+                      placeholder={activeConfig.orgPlaceholder}
+                      className="w-full px-3.5 py-2.5 rounded-sm border border-border bg-paper text-base sm:text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors"
+                    />
+                  </div>
+                )}
+
+                {/* 4. Professional Role Field (Shown for Career & Business inquiries) */}
+                {activeConfig.showRole && (
+                  <div>
+                    <label
+                      htmlFor="contact-role"
+                      className="block font-mono text-xs text-muted uppercase tracking-wider mb-1.5"
+                    >
+                      Your Role / Title <span className="text-muted/60 text-[10px] lowercase">(optional)</span>
+                    </label>
+                    {inquiryType === 'career' ? (
+                      <div className="space-y-2">
+                        <div className="flex flex-wrap gap-1.5">
+                          {CAREER_ROLE_OPTIONS.map((opt) => (
+                            <button
+                              key={opt}
+                              type="button"
+                              onClick={() => setFormData({ ...formData, role: opt })}
+                              className={`font-mono text-[11px] px-2.5 py-1 rounded-sm border transition-colors ${
+                                formData.role === opt
+                                  ? 'bg-paper text-ink border-accent'
+                                  : 'bg-paper/40 text-muted hover:text-ink border-border'
+                              }`}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                        <input
+                          id="contact-role"
+                          type="text"
+                          value={formData.role}
+                          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                          placeholder="Or type custom role title (e.g. Lead ML Engineer)..."
+                          className="w-full px-3 py-2 rounded-sm border border-border bg-paper text-xs text-ink placeholder:text-muted/60 focus:border-accent transition-colors"
+                        />
+                      </div>
+                    ) : (
+                      <input
+                        id="contact-role"
+                        type="text"
+                        value={formData.role}
+                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                        placeholder="e.g. VP of Product, Strategic Partner..."
+                        className="w-full px-3.5 py-2.5 rounded-sm border border-border bg-paper text-base sm:text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors"
+                      />
+                    )}
+                  </div>
+                )}
+
+                {/* 5. Message Textarea */}
                 <div>
-                  <label
-                    htmlFor="contact-message"
-                    className="block font-mono text-xs text-muted uppercase tracking-wider mb-1.5"
-                  >
-                    Message (10–2,000 characters) <span className="text-accent">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label
+                      htmlFor="contact-message"
+                      className="block font-mono text-xs text-muted uppercase tracking-wider"
+                    >
+                      Message <span className="text-accent">*</span>
+                    </label>
+                    <span className="font-mono text-[10px] text-muted">
+                      {formData.message.length} / 3000 chars
+                    </span>
+                  </div>
                   <textarea
                     id="contact-message"
                     required
                     rows={4}
-                    autoComplete="off"
                     value={formData.message}
                     onChange={(e) => {
                       setFormData({ ...formData, message: e.target.value })
                       if (fieldErrors.message) setFieldErrors({ ...fieldErrors, message: '' })
                     }}
-                    placeholder="Describe the opportunity, technical challenge, or project..."
+                    placeholder={activeConfig.messagePlaceholder}
                     aria-invalid={Boolean(fieldErrors.message)}
                     aria-describedby={fieldErrors.message ? 'message-error' : undefined}
-                    className={`w-full px-3.5 py-2.5 rounded-sm border bg-paper text-base sm:text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors resize-y ${
-                      fieldErrors.message ? 'border-red-500/60' : 'border-border'
+                    className={`w-full px-3.5 py-2.5 rounded-sm border bg-paper text-base sm:text-sm text-ink placeholder:text-muted/60 focus:border-accent transition-colors resize-y min-h-[110px] ${
+                      fieldErrors.message ? 'border-red-500/70' : 'border-border'
                     }`}
                   />
                   {fieldErrors.message && (
@@ -328,52 +577,44 @@ export default function ContactForm() {
                   )}
                 </div>
 
-                {/* Server Error Display with Mailto Fallback */}
+                {/* Server Error Alert */}
                 {serverError && (
                   <div
                     role="alert"
-                    className="p-3.5 rounded-sm border border-red-500/30 bg-red-500/10 text-xs font-mono text-red-600 dark:text-red-400 flex items-start gap-2.5"
+                    className="p-3 rounded-sm border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300 font-mono text-xs flex items-start gap-2"
                   >
                     <AlertCircle size={15} className="flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p>{serverError}</p>
-                      <p className="mt-1 text-[11px]">
-                        Alternatively, email directly at{' '}
-                        <a
-                          href={`mailto:${PERSONAL_INFO.email}?subject=Direct Portfolio Message`}
-                          className="underline hover:text-ink font-semibold"
-                        >
-                          {PERSONAL_INFO.email}
-                        </a>
-                      </p>
-                    </div>
+                    <span>{serverError}</span>
                   </div>
                 )}
 
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={status === 'submitting'}
-                  className="btn-editorial w-full justify-center py-2.5"
-                  data-cursor="Transmit"
-                >
-                  {status === 'submitting' ? (
-                    <>
-                      <Loader2 size={15} className="animate-spin" />
-                      <span>Transmitting Message...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send size={15} />
-                      <span>Transmit Message</span>
-                    </>
-                  )}
-                </button>
+                {/* Submit Action & Privacy Note */}
+                <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <p className="font-mono text-[10px] text-muted/70 order-2 sm:order-1 max-w-xs leading-relaxed">
+                    Direct communication guarantee: your note is sent privately and is never shared.
+                  </p>
 
-                {/* One-Line Privacy Guarantee */}
-                <p className="font-mono text-[11px] text-muted text-center pt-2">
-                  Details are used solely to reply to your inquiry and are never shared.
-                </p>
+                  <button
+                    type="submit"
+                    disabled={status === 'submitting'}
+                    className="btn-editorial justify-center py-2.5 px-6 min-h-[44px] text-sm order-1 sm:order-2 disabled:opacity-60 cursor-pointer"
+                    data-cursor="Send"
+                  >
+                    {status === 'submitting' ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        <span>Delivering...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send size={15} />
+                        <span>
+                          {inquiryType === 'career' ? 'Send Career Inquiry' : "Let's Connect"}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </form>
             )}
           </div>

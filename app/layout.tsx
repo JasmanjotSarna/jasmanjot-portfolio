@@ -62,7 +62,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${PERSONAL_INFO.name} — AI/ML Engineer & Full Stack Developer`,
     description:
-      'Personal portfolio and projects: CareerOS, Multi AI Agent Research System, Face Emotion Recognition, and Health Score Predictor.',
+      'Personal portfolio and projects: CareerOS, Multi AI Agent Research System, Cardio Detect AI, and Mind Scroll AI.',
     type: 'website',
     url: siteUrl,
     siteName: PERSONAL_INFO.name,
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: `${PERSONAL_INFO.name} — AI/ML Engineer & Full Stack Developer`,
     description:
-      'Personal portfolio and projects: CareerOS, Multi AI Agent Research System, Face Emotion Recognition, and Health Score Predictor.',
+      'Personal portfolio and projects: CareerOS, Multi AI Agent Research System, Cardio Detect AI, and Mind Scroll AI.',
     images: ['/og-image.png'],
   },
   icons: {

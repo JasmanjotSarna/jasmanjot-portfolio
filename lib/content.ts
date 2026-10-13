@@ -24,6 +24,7 @@ export interface Project {
   timeline: string
   role: string
   featured?: boolean
+  inDevelopment?: boolean
   // Draft contextual lines (not on resume, marked draft: true)
   problem?: {
     text: string
@@ -93,6 +94,7 @@ export const PROJECTS: Project[] = [
     timeline: 'May 2026 – Present',
     role: 'Full Stack & AI Developer',
     featured: true,
+    inDevelopment: true,
     problem: {
       text: 'Job seekers face fragmented tools for resume tailoring, interview preparation, and application tracking, frequently encountering automated screening hurdles.',
       draft: true,
@@ -102,7 +104,7 @@ export const PROJECTS: Project[] = [
       'Integrated the OpenAI API with prompt engineering to power an AI ATS Resume Builder module.',
     ],
     architectureOverview: {
-      label: 'Simplified Overview (Pending Confirmation)',
+      label: 'Simplified Overview (In Development)',
       draft: true,
       nodes: [
         { id: 'client', label: 'Frontend', sub: 'React / Next.js 15' },
@@ -118,33 +120,29 @@ export const PROJECTS: Project[] = [
         { from: 'llm', to: 'api', label: 'Structured response' },
         { from: 'api', to: 'db', label: 'Persist state' },
       ],
-      confirmationNote: 'Confirm backend queue (BullMQ/Redis) and database schema wiring.',
+      confirmationNote: 'Currently in active development with backend queue and database schema wiring.',
     },
     stack: ['React', 'Next.js 15', 'NestJS', 'PostgreSQL', 'Redis', 'BullMQ', 'OpenAI API'],
     links: {
       github: {
         label: 'Source Code',
         isTodo: true,
-        todoNote: 'CareerOS repository URL (public or private)',
+        todoNote: 'CareerOS is currently in development',
       },
       live: {
         label: 'Live Platform',
         isTodo: true,
-        todoNote: 'CareerOS live deployment URL',
-      },
-      demoMedia: {
-        label: 'Walkthrough Video',
-        isTodo: true,
-        todoNote: 'Walkthrough video or GIF demonstrating the AI Resume Suite, Interview Suite, or Job Tracker',
+        todoNote: 'CareerOS is currently in development',
       },
     },
   },
   {
     id: 'multi-ai-agent-research',
     title: 'Multi AI Agent Research System',
-    subtitle: 'Multi-Agent Research Pipeline',
+    subtitle: 'Autonomous Multi-Agent Research Pipeline',
     timeline: '2026',
     role: 'AI Engineer',
+    inDevelopment: true,
     problem: {
       text: 'Single-prompt queries struggle to independently retrieve diverse sources, verify facts, draft multi-section chapters, and critique content.',
       draft: true,
@@ -153,7 +151,7 @@ export const PROJECTS: Project[] = [
       'Built a multi-agent research pipeline using LangChain and GPT-4o-mini, with search and reader agents collecting data and writer and critic agents producing the final report.',
     ],
     architectureOverview: {
-      label: 'Simplified Overview (Pending Confirmation)',
+      label: 'Autonomous Agent Topology (In Development)',
       draft: true,
       nodes: [
         { id: 'search', label: 'Search Agent', sub: 'Data collection' },
@@ -167,104 +165,110 @@ export const PROJECTS: Project[] = [
         { from: 'writer', to: 'critic', label: 'Draft output' },
         { from: 'critic', to: 'writer', label: 'Review pass' },
       ],
-      confirmationNote: 'Confirm message passing format between LangChain agents.',
+      confirmationNote: 'Agent message-passing protocol and tool-calling loop in active development.',
     },
-    stack: ['Python', 'LangChain', 'GPT-4o-mini'],
+    stack: ['Python', 'LangChain', 'GPT-4o-mini', 'Vector DB', 'Multi-Agent'],
     links: {
       github: {
         label: 'Source Code',
         isTodo: true,
-        todoNote: 'Multi AI Agent Research System GitHub repository URL',
-      },
-      demoMedia: {
-        label: 'Pipeline Demo',
-        isTodo: true,
-        todoNote: 'CLI execution recording or GIF showing the search, reader, writer, and critic agents executing',
+        todoNote: 'Multi AI Agent Research System is in active development',
       },
     },
   },
   {
-    id: 'face-emotion-recognition',
-    title: 'Face Emotion Recognition System',
-    subtitle: 'Comparative CNN Deep Learning Models',
-    timeline: 'Dec 2025 – Jan 2026',
-    role: 'Deep Learning Developer',
-    problem: {
-      text: 'Real-time facial classification requires balancing model parameter count with webcam frame inference latency.',
-      draft: true,
-    },
-    whatIBuilt: [
-      'Built and evaluated two CNN-based deep learning models — one in TensorFlow, one in PyTorch — for real-time facial emotion classification via webcam input.',
-    ],
-    architectureOverview: {
-      label: 'Simplified Overview (Pending Confirmation)',
-      draft: true,
-      nodes: [
-        { id: 'webcam', label: 'Webcam Stream', sub: 'OpenCV VideoCapture' },
-        { id: 'detect', label: 'Face Detection', sub: 'ROI extraction' },
-        { id: 'cnn', label: 'CNN Models', sub: 'TensorFlow vs PyTorch' },
-        { id: 'class', label: 'Classification', sub: 'Real-time emotion class' },
-      ],
-      connections: [
-        { from: 'webcam', to: 'detect', label: 'Video frame' },
-        { from: 'detect', to: 'cnn', label: 'Normalized face ROI' },
-        { from: 'cnn', to: 'class', label: 'Predicted class' },
-      ],
-      confirmationNote: 'Confirm webcam input resolution and model input dimensions.',
-    },
-    stack: ['Python', 'OpenCV', 'TensorFlow', 'PyTorch'],
-    links: {
-      github: {
-        label: 'Source Code',
-        isTodo: true,
-        todoNote: 'Face Emotion Recognition System GitHub repository URL',
-      },
-      demoMedia: {
-        label: 'Webcam Demo',
-        isTodo: true,
-        todoNote: 'Screen recording or GIF showing the real-time webcam emotion classifier in action',
-      },
-    },
-    metricTodo: 'Validation accuracy % or FPS metrics from training notebooks',
-  },
-  {
-    id: 'health-score-predictor',
-    title: 'Health Score Predictor',
-    subtitle: 'Student Health Score Regression Model',
+    id: 'cardiodetectai',
+    title: 'Cardio Detect AI',
+    subtitle: 'Clinical Intelligence & Cardiovascular Risk Classification Platform',
     timeline: '2026',
-    role: 'Data Scientist',
+    role: 'ML & Full Stack Developer',
     problem: {
-      text: 'Student health variance is influenced by interconnected lifestyle habits, sleep patterns, and academic pressures.',
+      text: 'Traditional diagnostic tools often lack transparent interpretability, making it difficult for researchers and clinicians to understand the underlying clinical indicators behind cardiovascular risk predictions.',
       draft: true,
     },
     whatIBuilt: [
-      'Built a regression model to predict a student health score from demographic, academic, lifestyle, social media usage, sleep, and stress-related features.',
+      'Engineered a medical-technology web platform exploring cardiovascular disease risk classification through radical algorithmic interpretability.',
+      'Trained a reproducible Scikit-Learn K-Nearest Neighbors pipeline (k=5, AUC = 0.9269, 86.41% accuracy) over historical clinical cohorts (918 cases), served via FastAPI.',
+      'Developed a high-precision React 19 / Vite frontend with real-time canvas ECG telemetry, 5 nearest neighbor consensus, and an interactive What-If sensitivity simulator.',
     ],
     architectureOverview: {
-      label: 'Simplified Overview (Pending Confirmation)',
+      label: 'Clinical ML Inference Flow',
       draft: true,
       nodes: [
-        { id: 'data', label: 'Student Data', sub: 'Demographic & lifestyle features' },
-        { id: 'prep', label: 'EDA & Preprocessing', sub: 'Pandas' },
-        { id: 'model', label: 'Regression Model', sub: 'Scikit-Learn' },
-        { id: 'score', label: 'Health Score', sub: 'Predicted metric' },
+        { id: 'intake', label: 'Patient Vitals', sub: '11 Clinical Biomarkers' },
+        { id: 'api', label: 'FastAPI Backend', sub: 'Uvicorn ASGI' },
+        { id: 'knn', label: 'KNN Pipeline', sub: 'Scikit-Learn (k=5)' },
+        { id: 'explain', label: 'Interpretability', sub: '5 Neighbor Consensus' },
+        { id: 'ui', label: 'Clinical Console', sub: 'React 19 + Real-time ECG' },
       ],
       connections: [
-        { from: 'data', to: 'prep', label: 'Feature matrix' },
-        { from: 'prep', to: 'model', label: 'Cleaned features' },
-        { from: 'model', to: 'score', label: 'Health prediction' },
+        { from: 'intake', to: 'api', label: 'Telemetry POST' },
+        { from: 'api', to: 'knn', label: 'Normalized feature vector' },
+        { from: 'knn', to: 'explain', label: 'Euclidean nearest neighbors' },
+        { from: 'explain', to: 'ui', label: 'Risk & sensitivity verdict' },
       ],
-      confirmationNote: 'Confirm specific regression algorithm used (e.g. Ridge, Lasso, Random Forest Regressor).',
+      confirmationNote: 'Production model deployed and validated against holdout clinical cohorts.',
     },
-    stack: ['Python', 'Scikit-Learn', 'Pandas', 'Regression'],
+    stack: ['React 19', 'Vite', 'Python', 'FastAPI', 'Scikit-Learn', 'Tailwind CSS', 'Recharts'],
     links: {
       github: {
         label: 'Source Code',
-        isTodo: true,
-        todoNote: 'Health Score Predictor GitHub repository URL',
+        url: 'https://github.com/JasmanjotSarna/cardiodetectai',
+        isTodo: false,
+      },
+      live: {
+        label: 'Live Platform',
+        url: 'https://cardiodetectai.vercel.app/',
+        isTodo: false,
       },
     },
-    metricTodo: 'R² score, MAE, or dataset sample count from analysis scripts',
+  },
+  {
+    id: 'mind-scroll-ai',
+    title: 'Mind Scroll AI',
+    subtitle: 'Student Social Media & Mental Health Impact Predictor',
+    timeline: '2026',
+    role: 'ML & Full Stack Developer',
+    problem: {
+      text: 'Excessive daily screen time, fragmented sleep cycles, and unregulated social media usage heavily strain student mental health, yet students lack actionable insights into how their specific habits impact cognitive wellness.',
+      draft: true,
+    },
+    whatIBuilt: [
+      'Built a full-stack machine learning application trained on 5,000 student survey responses to analyze digital lifestyle impacts on mental health.',
+      'Trained and evaluated multiple regression architectures, deploying a tuned Random Forest regression pipeline (R² = 0.864, MAE = ±0.37) with ColumnTransformer preprocessing.',
+      'Engineered a FastAPI backend and React 19 frontend featuring an animated semicircular wellness score gauge, waterfall driver analysis, and real-time What-If habit simulation.',
+    ],
+    architectureOverview: {
+      label: 'Predictive Regression Pipeline',
+      draft: true,
+      nodes: [
+        { id: 'survey', label: 'Habit Telemetry', sub: '12 Lifestyle Features' },
+        { id: 'prep', label: 'Preprocessing', sub: 'ColumnTransformer' },
+        { id: 'rf', label: 'Random Forest', sub: 'Tuned Regressor (R²=0.864)' },
+        { id: 'driver', label: 'Driver Engine', sub: 'Impact Waterfall' },
+        { id: 'client', label: 'Interactive UI', sub: 'React 19 + Score Gauge' },
+      ],
+      connections: [
+        { from: 'survey', to: 'prep', label: 'Student profile' },
+        { from: 'prep', to: 'rf', label: 'Transformed feature matrix' },
+        { from: 'rf', to: 'driver', label: 'Predicted wellness index' },
+        { from: 'driver', to: 'client', label: 'What-if feedback & PDF' },
+      ],
+      confirmationNote: 'Evaluated with 70/30 train/test split on empirical student dataset.',
+    },
+    stack: ['React 19', 'Vite', 'Python', 'FastAPI', 'Scikit-Learn', 'Tailwind CSS', 'Framer Motion'],
+    links: {
+      github: {
+        label: 'Source Code',
+        url: 'https://github.com/JasmanjotSarna/Mind_Scroll_AI',
+        isTodo: false,
+      },
+      live: {
+        label: 'Live Platform',
+        url: 'https://mindscrollai.vercel.app/',
+        isTodo: false,
+      },
+    },
   },
 ]
 
@@ -274,7 +278,7 @@ export const EXPERIENCE: ExperienceItem[] = [
   {
     role: 'AI Full Stack Developer',
     company: 'Lavelda Coffee Beans',
-    period: 'Jan 2026 – July 2026',
+    period: 'Mar 2026 – Aug 2026',
     location: 'Remote',
     bullets: [
       'Developed and deployed LLM-powered AI chatbots using the OpenAI API to automate customer support and product inquiries.',

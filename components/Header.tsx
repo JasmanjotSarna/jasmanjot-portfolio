@@ -42,19 +42,19 @@ export default function Header() {
         <div className="container-editorial">
           <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
             {/* Masthead Identity */}
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-shrink-0">
               <a href="#top" className="group text-inherit no-underline">
-                <span className="font-display font-bold text-lg sm:text-xl tracking-tight text-ink group-hover:text-accent transition-colors">
+                <span className="font-display font-bold text-lg sm:text-xl tracking-tight text-ink group-hover:text-accent transition-colors whitespace-nowrap">
                   {PERSONAL_INFO.name}
                 </span>
               </a>
-              <span className="font-mono text-[11px] text-muted hidden sm:inline tracking-tight">
+              <span className="font-mono text-[11px] text-muted hidden sm:inline tracking-tight whitespace-nowrap">
                 AI/ML Engineer • Full Stack • Jaipur, IN
               </span>
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-6 font-mono text-xs text-muted">
+            <nav className="hidden lg:flex items-center gap-5 xl:gap-6 font-mono text-xs text-muted">
               <a href="#projects" className="hover:text-ink transition-colors no-underline">
                 Projects
               </a>
@@ -73,7 +73,7 @@ export default function Header() {
             </nav>
 
             {/* Quick Action Links & Mobile Menu Toggle */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <a
                 href={PERSONAL_INFO.resumePdf}
                 target="_blank"
@@ -84,7 +84,7 @@ export default function Header() {
                 <span>Resume</span>
               </a>
 
-              <div className="hidden sm:flex items-center gap-1.5 pl-1 border-l border-border">
+              <div className="hidden lg:flex items-center gap-1.5 pl-1 border-l border-border">
                 <a
                   href={PERSONAL_INFO.github}
                   target="_blank"
@@ -122,14 +122,14 @@ export default function Header() {
                 {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
               </button>
 
-              {/* Mobile Menu Hamburger Button (< md) */}
+              {/* Mobile/Tablet Menu Hamburger Button (< lg) */}
               <button
                 ref={toggleBtnRef}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-nav-drawer"
                 aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-                className="md:hidden p-2 text-ink hover:bg-surface rounded transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                className="lg:hidden p-2 text-ink hover:bg-surface rounded transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
                 {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
@@ -142,7 +142,7 @@ export default function Header() {
           <div
             id="mobile-nav-drawer"
             ref={menuRef}
-            className="md:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 bg-paper/98 backdrop-blur-xl border-b border-border z-50 flex flex-col justify-between p-6 sm:p-8 overflow-y-auto"
+            className="lg:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 bg-paper/98 backdrop-blur-xl border-b border-border z-50 flex flex-col justify-between p-6 sm:p-8 overflow-y-auto"
             role="dialog"
             aria-modal="true"
             aria-label="Mobile Navigation Menu"

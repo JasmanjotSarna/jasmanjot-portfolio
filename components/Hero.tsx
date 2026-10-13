@@ -39,10 +39,10 @@ export default function Hero() {
       className="relative min-h-[90dvh] sm:min-h-[92dvh] pt-6 sm:pt-14 pb-14 sm:pb-20 border-b border-border overflow-hidden flex flex-col justify-center"
     >
       {/* Corner Crop Marks for Printed Proof Aesthetic */}
-      <div className="absolute top-3 left-4 font-mono text-[10px] text-muted/60 select-none hidden sm:block">
+      <div className="absolute top-3 left-4 font-mono text-[10px] text-muted/60 select-none hidden lg:block">
         + PROOF_TL [0,0]
       </div>
-      <div className="absolute top-3 right-4 font-mono text-[10px] text-muted/60 select-none hidden sm:block">
+      <div className="absolute top-3 right-4 font-mono text-[10px] text-muted/60 select-none hidden lg:block">
         + PROOF_TR [1180,0]
       </div>
 

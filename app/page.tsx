@@ -49,7 +49,7 @@ export default function Home() {
                 Top Projects
               </h2>
               <p className="text-sm sm:text-base text-muted max-w-2xl leading-relaxed">
-                A full-stack SaaS platform, a multi-agent research pipeline, a computer vision model, and a regression project.
+                Full-stack AI SaaS platforms, multi-agent systems, and production machine learning applications.
               </p>
             </div>
 

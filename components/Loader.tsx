@@ -532,7 +532,8 @@ export default function Loader({ onComplete }: LoaderProps) {
           title="Skip intro animation"
           aria-label="Skip intro animation"
         >
-          Skip [Esc]
+          <span>Skip</span>
+          <span className="hidden sm:inline">&nbsp;[Esc]</span>
         </button>
       </div>
 

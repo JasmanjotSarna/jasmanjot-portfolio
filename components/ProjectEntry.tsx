@@ -38,6 +38,7 @@ export default function ProjectEntry({ project, index, totalProjects }: ProjectE
   const hasAnyLinkToRender =
     hasLiveUrl ||
     hasGithubUrl ||
+    project.inDevelopment ||
     (SHOW_PLACEHOLDERS && (project.links.github?.isTodo || project.links.live?.isTodo))
 
   return (
@@ -95,8 +96,14 @@ export default function ProjectEntry({ project, index, totalProjects }: ProjectE
               <span className="font-mono text-xs text-muted">
                 Role: {project.role}
               </span>
+              {project.inDevelopment && (
+                <span className="inline-flex items-center gap-1.5 mt-2.5 px-2 py-0.5 text-[11px] font-mono font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-sm w-max">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  IN DEVELOPMENT
+                </span>
+              )}
               {project.featured && (
-                <span className="inline-block mt-3 px-2 py-0.5 text-[11px] font-mono font-semibold bg-accent-subtle text-accent border border-accent-border rounded-sm w-max">
+                <span className="inline-block mt-2 px-2 py-0.5 text-[11px] font-mono font-semibold bg-accent-subtle text-accent border border-accent-border rounded-sm w-max">
                   FEATURED PLATFORM
                 </span>
               )}
@@ -136,9 +143,23 @@ export default function ProjectEntry({ project, index, totalProjects }: ProjectE
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs font-mono text-muted">
-                  <HelpCircle size={13} className="text-accent" />
-                  <span>Pending Confirmation</span>
+                  {project.inDevelopment ? (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                      <span>In Development</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span>Production Architecture</span>
+                    </>
+                  )}
                 </div>
+              </div>
+
+              {/* Mobile swipe hint */}
+              <div className="sm:hidden font-mono text-[10px] text-muted/70 mb-2 flex items-center justify-end gap-1">
+                <span>&larr; Swipe to view full flow &rarr;</span>
               </div>
 
               {/* Animated Node Flow */}
@@ -242,6 +263,14 @@ export default function ProjectEntry({ project, index, totalProjects }: ProjectE
             {/* Links / Placeholders */}
             {hasAnyLinkToRender && (
               <div className="flex flex-wrap items-center gap-3">
+                {/* In Development Badge */}
+                {project.inDevelopment && !project.links.github?.url && !project.links.live?.url && (
+                  <span className="inline-flex items-center gap-1.5 font-mono text-xs px-2.5 py-1 rounded-sm border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    In Development
+                  </span>
+                )}
+
                 {/* GitHub Source Link */}
                 {project.links.github && (
                   project.links.github.url ? (
@@ -255,7 +284,7 @@ export default function ProjectEntry({ project, index, totalProjects }: ProjectE
                       <Github size={13} />
                       <span>Source</span>
                     </a>
-                  ) : SHOW_PLACEHOLDERS ? (
+                  ) : !project.inDevelopment && SHOW_PLACEHOLDERS ? (
                     <span
                       className="font-mono text-[11px] text-muted border border-dashed border-border px-2 py-0.5 rounded bg-surface/40"
                       title={project.links.github.todoNote}
@@ -278,7 +307,7 @@ export default function ProjectEntry({ project, index, totalProjects }: ProjectE
                       <ExternalLink size={13} />
                       <span>Live</span>
                     </a>
-                  ) : SHOW_PLACEHOLDERS ? (
+                  ) : !project.inDevelopment && SHOW_PLACEHOLDERS ? (
                     <span
                       className="font-mono text-[11px] text-muted border border-dashed border-border px-2 py-0.5 rounded bg-surface/40"
                       title={project.links.live.todoNote}

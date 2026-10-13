@@ -47,6 +47,10 @@ firebase-adminsdk*.json
 # Testing & scratch files
 /coverage
 /scratch/
+/data/
+/supabase/.temp/
+.agents/
+skills-lock.json
 
 # Debug logs
 *.log

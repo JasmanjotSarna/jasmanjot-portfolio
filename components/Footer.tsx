@@ -50,11 +50,29 @@ export default function Footer() {
         </div>
 
         {/* Large Full-Width Wordmark */}
-        <div className="mb-14 overflow-hidden py-2 select-none">
-          <div className="font-display text-[clamp(1.9rem,7.5vw,7.5rem)] font-bold tracking-tight text-ink/90 leading-[0.88] whitespace-nowrap">
-            JASMANJOT SINGH SARNA
+
+        <div className="mb-10 overflow-hidden py-3 select-none">
+          <div
+            className="flex w-max animate-marquee motion-reduce:animate-none"
+            aria-label="Building intelligent systems"
+          >
+            {[0, 1].map((item) => (
+              <div
+                key={item}
+                className="flex shrink-0 items-center"
+                aria-hidden={item === 1}
+              >
+                <span className="font-display text-[clamp(1.5rem,4vw,4rem)] font-bold tracking-[-0.04em] text-ink/70 leading-none whitespace-nowrap pr-6">
+                  BUILDING INTELLIGENT SYSTEMS.
+                </span>
+                <span className="text-ink/40 text-2xl pr-6">
+                  ✳
+                </span>
+              </div>
+            ))}
           </div>
         </div>
+
 
         {/* Colophon & Links */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-border font-mono text-xs text-muted">
