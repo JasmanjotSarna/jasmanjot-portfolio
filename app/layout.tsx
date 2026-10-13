@@ -4,6 +4,7 @@ import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import SmoothScroll from '@/components/SmoothScroll'
 import { PERSONAL_INFO } from '@/lib/content'
+import { Analytics } from '@vercel/analytics/next'
 
 const newsreader = Newsreader({
   subsets: ['latin'],
@@ -134,6 +135,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </SmoothScroll>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )
